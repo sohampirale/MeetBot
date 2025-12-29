@@ -72,13 +72,17 @@ The bot can perform three presentation actions in meetings:
 
 ```
 meetbot/
-├── agents.md                    # This file - root project context
+├── AGENTS.md                    # This file - root project context
 ├── frontend/                    # Next.js application
-│   └── agents.md               # Frontend-specific context (if needed)
+│   └── AGENTS.md               # Frontend-specific context (if needed)
 └── backend/                     # FastAPI application
-    ├── agents.md               # Backend-specific context (if needed)
-    ├── db_schema.md            # Database models and schema documentation
-    └── api_endpoints.md        # API routes and endpoint documentation
+    ├── AGENTS.md               # Backend-specific context (if needed)
+    ├── db_schema.md                # Database models and schema documentation
+    └── api_endpoints/  # API routes and endpoint documentation
+            ├── AGENTS.md               # Context for working with any endpoints at backend level
+            ├────user_endpoints.md  #All endpoints related to user
+            ├────bot_endpoints.md   #All endpoints related to bot
+            └────credit_endpoints.md  #All endpoints related to credit
 ```
 
 ### Key Context Files
@@ -89,15 +93,15 @@ meetbot/
 
 ### Navigation Rules
 1. **Do not enter any subdirectory without definite purpose** - stay focused on your task
-2. **Each subdirectory MAY have an agents.md file** for additional context specific to that directory
-3. **Always read agents.md when entering a subdirectory** where you need to perform work
-4. **Do not read agents.md files** of directories where you won't perform any read/write operations
+2. **Each subdirectory MAY have an AGENTS.md file** for additional context specific to that directory
+3. **Always read AGENTS.md when entering a subdirectory** where you need to perform work
+4. **Do not read AGENTS.md files** of directories where you won't perform any read/write operations
 
 ### Context Discovery Pattern
 When working on a task:
-1. Read this root `agents.md` first to understand the project
+1. Read this root `AGENTS.md` first to understand the project
 2. Determine which part of the codebase your task relates to (frontend/backend)
-3. Navigate to the relevant directory and read its `agents.md` if present
+3. Navigate to the relevant directory and read its `AGENTS.md` if present
 4. For backend work, consult `db_schema.md` and `api_endpoints.md` as needed
 
 ### Development Principles
