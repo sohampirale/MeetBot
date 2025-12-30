@@ -1,4 +1,5 @@
-from jose import jwt
+import jwt
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from datetime import datetime, timedelta
 from typing import Dict, Any
 import os
@@ -60,3 +61,14 @@ def create_session_token(payload: Dict[str, Any]) -> str:
         return token
     except Exception as e:
         raise Exception(f"Failed to create session token: {str(e)}")
+
+
+def decode_token(token: str) -> Dict[str, Any]:
+    """Decode and validate a JWT token."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except ExpiredSignatureError:
+        raise Exception("Token has expired")
+    except InvalidTokenError:
+        raise Exception("Invalid token")

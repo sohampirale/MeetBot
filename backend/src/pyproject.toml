@@ -1,9 +1,16 @@
 [project]
 name = "src"
 version = "0.1.0"
-description = "Add your description here"
+description = "MeetBot Backend API"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "python-jose[cryptography]"
+    "fastapi>=0.104.0",
+    "beanie[all]>=1.21.0",
+    "motor>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "PyJWT>=2.8.0",
+    "pydantic[email]>=2.5.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6"
 ]
