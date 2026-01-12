@@ -1,0 +1,22 @@
+[
+  {
+    "filename": "opencode-custom-command-function-location.md",
+    "extracted_frontmatter": "---\nname : opencode-custom-command-function-location\nfilename : opencode-custom-command-function-location.md\ndescription : Discussion about where to declare functions for custom commands in opencode so they can be found by agents across different project directories\npoints_mentioned: [\"opencode\",\"custom-commands\",\"function-location\",\"shared-libraries\",\"~/.config/opencode\",\"cross-project\"]\n---",
+    "embedding_shape": 1024
+  },
+  {
+    "filename": "fastapi-server-startup-mongodb-config.md",
+    "extracted_frontmatter": "---\nname : FastAPI Server Startup and MongoDB Configuration\nfilename : fastapi-server-startup-mongodb-config.md\ndescription : Session focused on starting FastAPI server, adding CLI startup capability, and resolving MongoDB connection issues with deprecation warnings.\npoints_mentioned: [\"backend\",\"fastapi\",\"mongodb\",\"beanie\",\"lifespan\",\"cors\",\"uvicorn\",\"database-connection\"]\n---",
+    "embedding_shape": 1024
+  },
+  {
+    "filename": "pipecat-transport-configurations-research.md",
+    "extracted_frontmatter": "---\nname : Pipecat Transport Configurations Research\nfilename : pipecat-transport-configurations-research.md\ndescription : Comprehensive research on Pipecat transport configurations including Daily, LiveKit, WebRTC, and WebSocket implementations with detailed setup examples and best practices.\npoints_mentioned: [\"pipecat\", \"transport\", \"daily\", \"livekit\", \"webrtc\", \"websocket\", \"configuration\", \"voice-ai\", \"python\", \"javascript\"]\n---",
+    "embedding_shape": 1024
+  },
+  {
+    "filename": "jwt-helper-implementation-python-jose.md",
+    "extracted_frontmatter": "---\nname : JWT Helper Implementation with Python-Jose\nfilename : jwt-helper-implementation-python-jose.md\ndescription : Session focused on creating JWT helper functions for MeetBot backend authentication using python-jose library\npoints_mentioned: [\"backend\", \"fastapi\", \"jwt\", \"python-jose\", \"authentication\", \"helpers\", \"dependencies\"]\n---",
+    "embedding_shape": 1024
+  }
+]

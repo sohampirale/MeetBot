@@ -1,0 +1,5282 @@
+diff --git a/.opencode/agent/coder/AGENT.md b/.opencode/agent/coder/AGENT.md
+deleted file mode 100644
+index 5c60dda..0000000
+--- a/.opencode/agent/coder/AGENT.md
++++ /dev/null
+@@ -1,6 +0,0 @@
+----
+-name : 'Coder_agent'
+-description : 'Expert in coding backend expertise applications'
+----
+-
+-
+diff --git a/.opencode/skill/backend-development/SKILL.md b/.opencode/skill/backend-development/SKILL.md
+deleted file mode 100644
+index 860321e..0000000
+--- a/.opencode/skill/backend-development/SKILL.md
++++ /dev/null
+@@ -1,95 +0,0 @@
+----
+-name: backend-development
+-description: Build robust backend systems with modern technologies (Node.js, Python, Go, Rust), frameworks (NestJS, FastAPI, Django), databases (PostgreSQL, MongoDB, Redis), APIs (REST, GraphQL, gRPC), authentication (OAuth 2.1, JWT), testing strategies, security best practices (OWASP Top 10), performance optimization, scalability patterns (microservices, caching, sharding), DevOps practices (Docker, Kubernetes, CI/CD), and monitoring. Use when designing APIs, implementing authentication, optimizing database queries, setting up CI/CD pipelines, handling security vulnerabilities, building microservices, or developing production-ready backend systems.
+-license: MIT
+-version: 1.0.0
+----
+-
+-# Backend Development Skill
+-
+-Production-ready backend development with modern technologies, best practices, and proven patterns.
+-
+-## When to Use
+-
+-- Designing RESTful, GraphQL, or gRPC APIs
+-- Building authentication/authorization systems
+-- Optimizing database queries and schemas
+-- Implementing caching and performance optimization
+-- OWASP Top 10 security mitigation
+-- Designing scalable microservices
+-- Testing strategies (unit, integration, E2E)
+-- CI/CD pipelines and deployment
+-- Monitoring and debugging production systems
+-
+-## Technology Selection Guide
+-
+-**Languages:** Node.js/TypeScript (full-stack), Python (data/ML), Go (concurrency), Rust (performance)
+-**Frameworks:** NestJS, FastAPI, Django, Express, Gin
+-**Databases:** PostgreSQL (ACID), MongoDB (flexible schema), Redis (caching)
+-**APIs:** REST (simple), GraphQL (flexible), gRPC (performance)
+-
+-See: `references/backend-technologies.md` for detailed comparisons
+-
+-## Reference Navigation
+-
+-**Core Technologies:**
+-- `backend-technologies.md` - Languages, frameworks, databases, message queues, ORMs
+-- `backend-api-design.md` - REST, GraphQL, gRPC patterns and best practices
+-
+-**Security & Authentication:**
+-- `backend-security.md` - OWASP Top 10 2025, security best practices, input validation
+-- `backend-authentication.md` - OAuth 2.1, JWT, RBAC, MFA, session management
+-
+-**Performance & Architecture:**
+-- `backend-performance.md` - Caching, query optimization, load balancing, scaling
+-- `backend-architecture.md` - Microservices, event-driven, CQRS, saga patterns
+-
+-**Quality & Operations:**
+-- `backend-testing.md` - Testing strategies, frameworks, tools, CI/CD testing
+-- `backend-code-quality.md` - SOLID principles, design patterns, clean code
+-- `backend-devops.md` - Docker, Kubernetes, deployment strategies, monitoring
+-- `backend-debugging.md` - Debugging strategies, profiling, logging, production debugging
+-- `backend-mindset.md` - Problem-solving, architectural thinking, collaboration
+-
+-## Key Best Practices (2025)
+-
+-**Security:** Argon2id passwords, parameterized queries (98% SQL injection reduction), OAuth 2.1 + PKCE, rate limiting, security headers
+-
+-**Performance:** Redis caching (90% DB load reduction), database indexing (30% I/O reduction), CDN (50%+ latency cut), connection pooling
+-
+-**Testing:** 70-20-10 pyramid (unit-integration-E2E), Vitest 50% faster than Jest, contract testing for microservices, 83% migrations fail without tests
+-
+-**DevOps:** Blue-green/canary deployments, feature flags (90% fewer failures), Kubernetes 84% adoption, Prometheus/Grafana monitoring, OpenTelemetry tracing
+-
+-## Quick Decision Matrix
+-
+-| Need | Choose |
+-|------|--------|
+-| Fast development | Node.js + NestJS |
+-| Data/ML integration | Python + FastAPI |
+-| High concurrency | Go + Gin |
+-| Max performance | Rust + Axum |
+-| ACID transactions | PostgreSQL |
+-| Flexible schema | MongoDB |
+-| Caching | Redis |
+-| Internal services | gRPC |
+-| Public APIs | GraphQL/REST |
+-| Real-time events | Kafka |
+-
+-## Implementation Checklist
+-
+-**API:** Choose style → Design schema → Validate input → Add auth → Rate limiting → Documentation → Error handling
+-
+-**Database:** Choose DB → Design schema → Create indexes → Connection pooling → Migration strategy → Backup/restore → Test performance
+-
+-**Security:** OWASP Top 10 → Parameterized queries → OAuth 2.1 + JWT → Security headers → Rate limiting → Input validation → Argon2id passwords
+-
+-**Testing:** Unit 70% → Integration 20% → E2E 10% → Load tests → Migration tests → Contract tests (microservices)
+-
+-**Deployment:** Docker → CI/CD → Blue-green/canary → Feature flags → Monitoring → Logging → Health checks
+-
+-## Resources
+-
+-- OWASP Top 10: https://owasp.org/www-project-top-ten/
+-- OAuth 2.1: https://oauth.net/2.1/
+-- OpenTelemetry: https://opentelemetry.io/
+diff --git a/.opencode/skill/backend-development/references/backend-api-design.md b/.opencode/skill/backend-development/references/backend-api-design.md
+deleted file mode 100644
+index c46122f..0000000
+--- a/.opencode/skill/backend-development/references/backend-api-design.md
++++ /dev/null
+@@ -1,495 +0,0 @@
+-# Backend API Design
+-
+-Comprehensive guide to designing RESTful, GraphQL, and gRPC APIs with best practices (2025).
+-
+-## REST API Design
+-
+-### Resource-Based URLs
+-
+-**Good:**
+-```
+-GET    /api/v1/users              # List users
+-GET    /api/v1/users/:id          # Get specific user
+-POST   /api/v1/users              # Create user
+-PUT    /api/v1/users/:id          # Update user (full)
+-PATCH  /api/v1/users/:id          # Update user (partial)
+-DELETE /api/v1/users/:id          # Delete user
+-
+-GET    /api/v1/users/:id/posts    # Get user's posts
+-POST   /api/v1/users/:id/posts    # Create post for user
+-```
+-
+-**Bad (Avoid):**
+-```
+-GET /api/v1/getUser?id=123        # RPC-style, not RESTful
+-POST /api/v1/createUser           # Verb in URL
+-GET /api/v1/user-posts            # Unclear relationship
+-```
+-
+-### HTTP Status Codes (Meaningful Responses)
+-
+-**Success:**
+-- `200 OK` - Successful GET, PUT, PATCH
+-- `201 Created` - Successful POST (resource created)
+-- `204 No Content` - Successful DELETE
+-
+-**Client Errors:**
+-- `400 Bad Request` - Invalid input/validation error
+-- `401 Unauthorized` - Missing or invalid authentication
+-- `403 Forbidden` - Authenticated but not authorized
+-- `404 Not Found` - Resource doesn't exist
+-- `409 Conflict` - Resource conflict (duplicate email)
+-- `422 Unprocessable Entity` - Validation error (detailed)
+-- `429 Too Many Requests` - Rate limit exceeded
+-
+-**Server Errors:**
+-- `500 Internal Server Error` - Generic server error
+-- `502 Bad Gateway` - Upstream service error
+-- `503 Service Unavailable` - Temporary downtime
+-- `504 Gateway Timeout` - Upstream service timeout
+-
+-### Request/Response Format
+-
+-**Request:**
+-```typescript
+-POST /api/v1/users
+-Content-Type: application/json
+-
+-{
+-  "email": "user@example.com",
+-  "name": "John Doe",
+-  "age": 30
+-}
+-```
+-
+-**Success Response:**
+-```typescript
+-HTTP/1.1 201 Created
+-Content-Type: application/json
+-Location: /api/v1/users/123
+-
+-{
+-  "id": "123",
+-  "email": "user@example.com",
+-  "name": "John Doe",
+-  "age": 30,
+-  "createdAt": "2025-01-09T12:00:00Z",
+-  "updatedAt": "2025-01-09T12:00:00Z"
+-}
+-```
+-
+-**Error Response:**
+-```typescript
+-HTTP/1.1 400 Bad Request
+-Content-Type: application/json
+-
+-{
+-  "error": {
+-    "code": "VALIDATION_ERROR",
+-    "message": "Invalid input data",
+-    "details": [
+-      {
+-        "field": "email",
+-        "message": "Invalid email format",
+-        "value": "invalid-email"
+-      },
+-      {
+-        "field": "age",
+-        "message": "Age must be between 18 and 120",
+-        "value": 15
+-      }
+-    ],
+-    "timestamp": "2025-01-09T12:00:00Z",
+-    "path": "/api/v1/users"
+-  }
+-}
+-```
+-
+-### Pagination
+-
+-```typescript
+-// Request
+-GET /api/v1/users?page=2&limit=50
+-
+-// Response
+-{
+-  "data": [...],
+-  "pagination": {
+-    "page": 2,
+-    "limit": 50,
+-    "total": 1234,
+-    "totalPages": 25,
+-    "hasNext": true,
+-    "hasPrev": true
+-  },
+-  "links": {
+-    "first": "/api/v1/users?page=1&limit=50",
+-    "prev": "/api/v1/users?page=1&limit=50",
+-    "next": "/api/v1/users?page=3&limit=50",
+-    "last": "/api/v1/users?page=25&limit=50"
+-  }
+-}
+-```
+-
+-### Filtering and Sorting
+-
+-```
+-GET /api/v1/users?status=active&role=admin&sort=-createdAt,name&limit=20
+-
+-# Filters: status=active AND role=admin
+-# Sort: createdAt DESC, name ASC
+-# Limit: 20 results
+-```
+-
+-### API Versioning Strategies
+-
+-**URL Versioning (Most Common):**
+-```
+-/api/v1/users
+-/api/v2/users
+-```
+-
+-**Header Versioning:**
+-```
+-GET /api/users
+-Accept: application/vnd.myapi.v2+json
+-```
+-
+-**Query Parameter:**
+-```
+-/api/users?version=2
+-```
+-
+-**Recommendation:** URL versioning for simplicity and discoverability
+-
+-## GraphQL API Design
+-
+-### Schema Definition
+-
+-```graphql
+-type User {
+-  id: ID!
+-  email: String!
+-  name: String!
+-  posts: [Post!]!
+-  createdAt: DateTime!
+-}
+-
+-type Post {
+-  id: ID!
+-  title: String!
+-  content: String!
+-  author: User!
+-  published: Boolean!
+-  createdAt: DateTime!
+-}
+-
+-type Query {
+-  user(id: ID!): User
+-  users(limit: Int = 50, offset: Int = 0): [User!]!
+-  post(id: ID!): Post
+-  posts(authorId: ID, published: Boolean): [Post!]!
+-}
+-
+-type Mutation {
+-  createUser(input: CreateUserInput!): User!
+-  updateUser(id: ID!, input: UpdateUserInput!): User!
+-  deleteUser(id: ID!): Boolean!
+-
+-  createPost(input: CreatePostInput!): Post!
+-  publishPost(id: ID!): Post!
+-}
+-
+-input CreateUserInput {
+-  email: String!
+-  name: String!
+-  password: String!
+-}
+-
+-input UpdateUserInput {
+-  email: String
+-  name: String
+-}
+-```
+-
+-### Queries
+-
+-```graphql
+-# Flexible data fetching - client specifies exactly what they need
+-query {
+-  user(id: "123") {
+-    id
+-    name
+-    email
+-    posts {
+-      id
+-      title
+-      published
+-    }
+-  }
+-}
+-
+-# With variables
+-query GetUser($userId: ID!) {
+-  user(id: $userId) {
+-    id
+-    name
+-    posts(published: true) {
+-      title
+-    }
+-  }
+-}
+-```
+-
+-### Mutations
+-
+-```graphql
+-mutation CreateUser($input: CreateUserInput!) {
+-  createUser(input: $input) {
+-    id
+-    email
+-    name
+-    createdAt
+-  }
+-}
+-
+-# Variables
+-{
+-  "input": {
+-    "email": "user@example.com",
+-    "name": "John Doe",
+-    "password": "SecurePass123!"
+-  }
+-}
+-```
+-
+-### Resolvers (NestJS Example)
+-
+-```typescript
+-@Resolver(() => User)
+-export class UserResolver {
+-  constructor(
+-    private userService: UserService,
+-    private postService: PostService,
+-  ) {}
+-
+-  @Query(() => User, { nullable: true })
+-  async user(@Args('id') id: string) {
+-    return this.userService.findById(id);
+-  }
+-
+-  @Query(() => [User])
+-  async users(
+-    @Args('limit', { defaultValue: 50 }) limit: number,
+-    @Args('offset', { defaultValue: 0 }) offset: number,
+-  ) {
+-    return this.userService.findAll({ limit, offset });
+-  }
+-
+-  @Mutation(() => User)
+-  async createUser(@Args('input') input: CreateUserInput) {
+-    return this.userService.create(input);
+-  }
+-
+-  // Field resolver - lazy load posts
+-  @ResolveField(() => [Post])
+-  async posts(@Parent() user: User) {
+-    return this.postService.findByAuthorId(user.id);
+-  }
+-}
+-```
+-
+-### GraphQL Best Practices
+-
+-1. **Avoid N+1 Problem** - Use DataLoader
+-```typescript
+-import DataLoader from 'dataloader';
+-
+-const postLoader = new DataLoader(async (authorIds: string[]) => {
+-  const posts = await db.posts.findAll({ where: { authorId: authorIds } });
+-  return authorIds.map(id => posts.filter(p => p.authorId === id));
+-});
+-
+-// In resolver
+-@ResolveField(() => [Post])
+-async posts(@Parent() user: User) {
+-  return this.postLoader.load(user.id);
+-}
+-```
+-
+-2. **Pagination** - Relay-style cursor pagination
+-3. **Error Handling** - Return errors in response
+-4. **Depth Limiting** - Prevent deeply nested queries
+-5. **Query Complexity Analysis** - Limit expensive queries
+-
+-## gRPC API Design
+-
+-### Protocol Buffers Schema
+-
+-```protobuf
+-syntax = "proto3";
+-
+-package user;
+-
+-service UserService {
+-  rpc GetUser (GetUserRequest) returns (User);
+-  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse);
+-  rpc CreateUser (CreateUserRequest) returns (User);
+-  rpc UpdateUser (UpdateUserRequest) returns (User);
+-  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+-
+-  // Streaming
+-  rpc StreamUsers (StreamUsersRequest) returns (stream User);
+-}
+-
+-message User {
+-  string id = 1;
+-  string email = 2;
+-  string name = 3;
+-  int64 created_at = 4;
+-}
+-
+-message GetUserRequest {
+-  string id = 1;
+-}
+-
+-message ListUsersRequest {
+-  int32 limit = 1;
+-  int32 offset = 2;
+-}
+-
+-message ListUsersResponse {
+-  repeated User users = 1;
+-  int32 total = 2;
+-}
+-
+-message CreateUserRequest {
+-  string email = 1;
+-  string name = 2;
+-  string password = 3;
+-}
+-```
+-
+-### Implementation (Node.js)
+-
+-```typescript
+-import * as grpc from '@grpc/grpc-js';
+-import * as protoLoader from '@grpc/proto-loader';
+-
+-const packageDefinition = protoLoader.loadSync('user.proto');
+-const userProto = grpc.loadPackageDefinition(packageDefinition).user;
+-
+-// Server implementation
+-const server = new grpc.Server();
+-
+-server.addService(userProto.UserService.service, {
+-  async getUser(call, callback) {
+-    const user = await userService.findById(call.request.id);
+-    callback(null, user);
+-  },
+-
+-  async createUser(call, callback) {
+-    const user = await userService.create(call.request);
+-    callback(null, user);
+-  },
+-
+-  async streamUsers(call) {
+-    const users = await userService.findAll();
+-    for (const user of users) {
+-      call.write(user);
+-    }
+-    call.end();
+-  },
+-});
+-
+-server.bindAsync(
+-  '0.0.0.0:50051',
+-  grpc.ServerCredentials.createInsecure(),
+-  () => server.start()
+-);
+-```
+-
+-### gRPC Benefits
+-
+-- **Performance:** 7-10x faster than REST (binary protocol)
+-- **Streaming:** Bi-directional streaming
+-- **Type Safety:** Strong typing via Protocol Buffers
+-- **Code Generation:** Auto-generate client/server code
+-- **Best For:** Internal microservices, high-performance systems
+-
+-## API Design Decision Matrix
+-
+-| Feature | REST | GraphQL | gRPC |
+-|---------|------|---------|------|
+-| **Use Case** | Public APIs, CRUD | Flexible data fetching | Microservices, performance |
+-| **Performance** | Moderate | Moderate | Fastest (7-10x REST) |
+-| **Caching** | HTTP caching built-in | Complex | No built-in caching |
+-| **Browser Support** | Native | Native | Requires gRPC-Web |
+-| **Learning Curve** | Easy | Moderate | Steep |
+-| **Streaming** | Limited (SSE) | Subscriptions | Bi-directional |
+-| **Tooling** | Excellent | Excellent | Good |
+-| **Documentation** | OpenAPI/Swagger | Schema introspection | Protobuf definition |
+-
+-## API Security Checklist
+-
+-- [ ] HTTPS/TLS only (no HTTP)
+-- [ ] Authentication (OAuth 2.1, JWT, API keys)
+-- [ ] Authorization (RBAC, check permissions)
+-- [ ] Rate limiting (prevent abuse)
+-- [ ] Input validation (all endpoints)
+-- [ ] CORS configured properly
+-- [ ] Security headers (CSP, HSTS, X-Frame-Options)
+-- [ ] API versioning implemented
+-- [ ] Error messages don't leak system info
+-- [ ] Audit logging (who did what, when)
+-
+-## API Documentation
+-
+-### OpenAPI/Swagger (REST)
+-
+-```yaml
+-openapi: 3.0.0
+-info:
+-  title: User API
+-  version: 1.0.0
+-paths:
+-  /api/v1/users:
+-    get:
+-      summary: List users
+-      parameters:
+-        - name: limit
+-          in: query
+-          schema:
+-            type: integer
+-            default: 50
+-      responses:
+-        '200':
+-          description: Successful response
+-          content:
+-            application/json:
+-              schema:
+-                type: object
+-                properties:
+-                  data:
+-                    type: array
+-                    items:
+-                      $ref: '#/components/schemas/User'
+-components:
+-  schemas:
+-    User:
+-      type: object
+-      properties:
+-        id:
+-          type: string
+-        email:
+-          type: string
+-        name:
+-          type: string
+-```
+-
+-## Resources
+-
+-- **REST Best Practices:** https://restfulapi.net/
+-- **GraphQL:** https://graphql.org/learn/
+-- **gRPC:** https://grpc.io/docs/
+-- **OpenAPI:** https://swagger.io/specification/
+diff --git a/.opencode/skill/backend-development/references/backend-architecture.md b/.opencode/skill/backend-development/references/backend-architecture.md
+deleted file mode 100644
+index 416678e..0000000
+--- a/.opencode/skill/backend-development/references/backend-architecture.md
++++ /dev/null
+@@ -1,454 +0,0 @@
+-# Backend Architecture Patterns
+-
+-Microservices, event-driven architecture, and scalability patterns (2025).
+-
+-## Monolith vs Microservices
+-
+-### Monolithic Architecture
+-
+-```
+-┌─────────────────────────────────┐
+-│      Single Application         │
+-│                                 │
+-│  ┌─────────┐  ┌──────────┐    │
+-│  │  Users  │  │ Products │    │
+-│  └─────────┘  └──────────┘    │
+-│  ┌─────────┐  ┌──────────┐    │
+-│  │ Orders  │  │ Payments │    │
+-│  └─────────┘  └──────────┘    │
+-│                                 │
+-│     Single Database             │
+-└─────────────────────────────────┘
+-```
+-
+-**Pros:**
+-- Simple to develop and deploy
+-- Easy local testing
+-- Single codebase
+-- Strong consistency (ACID transactions)
+-
+-**Cons:**
+-- Tight coupling
+-- Scaling limitations
+-- Deployment risk (all-or-nothing)
+-- Tech stack lock-in
+-
+-**When to Use:** Startups, MVPs, small teams, unclear domain boundaries
+-
+-### Microservices Architecture
+-
+-```
+-┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+-│  User    │   │ Product  │   │  Order   │   │ Payment  │
+-│ Service  │   │ Service  │   │ Service  │   │ Service  │
+-└────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬─────┘
+-     │              │              │              │
+-  ┌──▼──┐        ┌──▼──┐        ┌──▼──┐        ┌──▼──┐
+-  │  DB │        │  DB │        │  DB │        │  DB │
+-  └─────┘        └─────┘        └─────┘        └─────┘
+-```
+-
+-**Pros:**
+-- Independent deployment
+-- Technology flexibility
+-- Fault isolation
+-- Easier scaling (scale services independently)
+-
+-**Cons:**
+-- Complex deployment
+-- Distributed system challenges (network latency, partial failures)
+-- Data consistency (eventual consistency)
+-- Operational overhead
+-
+-**When to Use:** Large teams, clear domain boundaries, need independent scaling, tech diversity
+-
+-## Microservices Patterns
+-
+-### Database per Service Pattern
+-
+-**Concept:** Each service owns its database
+-
+-```
+-User Service → User DB (PostgreSQL)
+-Product Service → Product DB (MongoDB)
+-Order Service → Order DB (PostgreSQL)
+-```
+-
+-**Benefits:**
+-- Service independence
+-- Technology choice per service
+-- Fault isolation
+-
+-**Challenges:**
+-- No joins across services
+-- Distributed transactions
+-- Data duplication
+-
+-### API Gateway Pattern
+-
+-```
+-Client
+-  │
+-  ▼
+-┌─────────────────┐
+-│  API Gateway    │  - Authentication
+-│  (Kong/NGINX)   │  - Rate limiting
+-└────────┬────────┘  - Request routing
+-         │
+-    ┌────┴────┬────────┬────────┐
+-    ▼         ▼        ▼        ▼
+-  User    Product   Order   Payment
+- Service  Service  Service  Service
+-```
+-
+-**Responsibilities:**
+-- Request routing
+-- Authentication/authorization
+-- Rate limiting
+-- Request/response transformation
+-- Caching
+-
+-**Implementation (Kong):**
+-```yaml
+-services:
+-  - name: user-service
+-    url: http://user-service:3000
+-    routes:
+-      - name: user-route
+-        paths:
+-          - /api/users
+-
+-  - name: product-service
+-    url: http://product-service:3001
+-    routes:
+-      - name: product-route
+-        paths:
+-          - /api/products
+-
+-plugins:
+-  - name: rate-limiting
+-    config:
+-      minute: 100
+-  - name: jwt
+-```
+-
+-### Service Discovery
+-
+-**Concept:** Services find each other dynamically
+-
+-```typescript
+-// Consul service discovery
+-import Consul from 'consul';
+-
+-const consul = new Consul();
+-
+-// Register service
+-await consul.agent.service.register({
+-  name: 'user-service',
+-  address: '192.168.1.10',
+-  port: 3000,
+-  check: {
+-    http: 'http://192.168.1.10:3000/health',
+-    interval: '10s',
+-  },
+-});
+-
+-// Discover service
+-const services = await consul.catalog.service.nodes('product-service');
+-const productServiceUrl = `http://${services[0].ServiceAddress}:${services[0].ServicePort}`;
+-```
+-
+-### Circuit Breaker Pattern
+-
+-**Concept:** Stop calling failing service, prevent cascade failures
+-
+-```typescript
+-import CircuitBreaker from 'opossum';
+-
+-const breaker = new CircuitBreaker(callExternalService, {
+-  timeout: 3000, // 3s timeout
+-  errorThresholdPercentage: 50, // Open circuit after 50% failures
+-  resetTimeout: 30000, // Try again after 30s
+-});
+-
+-breaker.on('open', () => {
+-  console.log('Circuit breaker opened!');
+-});
+-
+-breaker.fallback(() => ({
+-  data: 'fallback-response',
+-  source: 'cache',
+-}));
+-
+-const result = await breaker.fire(requestParams);
+-```
+-
+-**States:**
+-- **Closed:** Normal operation, requests go through
+-- **Open:** Too many failures, requests fail immediately
+-- **Half-Open:** Testing if service recovered
+-
+-### Saga Pattern (Distributed Transactions)
+-
+-**Choreography-Based Saga:**
+-```
+-Order Service: Create Order → Publish "OrderCreated"
+-                                    ↓
+-Payment Service: Reserve Payment → Publish "PaymentReserved"
+-                                    ↓
+-Inventory Service: Reserve Stock → Publish "StockReserved"
+-                                    ↓
+-Shipping Service: Create Shipment → Publish "ShipmentCreated"
+-
+-If any step fails → Compensating transactions (rollback)
+-```
+-
+-**Orchestration-Based Saga:**
+-```
+-Saga Orchestrator
+-    ↓ Create Order
+-Order Service
+-    ↓ Reserve Payment
+-Payment Service
+-    ↓ Reserve Stock
+-Inventory Service
+-    ↓ Create Shipment
+-Shipping Service
+-```
+-
+-## Event-Driven Architecture
+-
+-**Impact:** 85% organizations recognize business value
+-
+-### Event Sourcing
+-
+-**Concept:** Store events, not current state
+-
+-```typescript
+-// Traditional: Store current state
+-{
+-  userId: '123',
+-  balance: 500
+-}
+-
+-// Event Sourcing: Store events
+-[
+-  { type: 'AccountCreated', userId: '123', timestamp: '...' },
+-  { type: 'MoneyDeposited', amount: 1000, timestamp: '...' },
+-  { type: 'MoneyWithdrawn', amount: 500, timestamp: '...' },
+-]
+-
+-// Reconstruct state by replaying events
+-const balance = events
+-  .filter(e => e.userId === '123')
+-  .reduce((acc, event) => {
+-    if (event.type === 'MoneyDeposited') return acc + event.amount;
+-    if (event.type === 'MoneyWithdrawn') return acc - event.amount;
+-    return acc;
+-  }, 0);
+-```
+-
+-**Benefits:**
+-- Complete audit trail
+-- Temporal queries (state at any point in time)
+-- Event replay for debugging
+-- Flexible projections
+-
+-### Message Broker Patterns
+-
+-**Kafka (Event Streaming):**
+-```typescript
+-import { Kafka } from 'kafkajs';
+-
+-const kafka = new Kafka({
+-  clientId: 'order-service',
+-  brokers: ['kafka:9092'],
+-});
+-
+-// Producer
+-const producer = kafka.producer();
+-await producer.send({
+-  topic: 'order-events',
+-  messages: [
+-    {
+-      key: order.id,
+-      value: JSON.stringify({
+-        type: 'OrderCreated',
+-        orderId: order.id,
+-        userId: order.userId,
+-        total: order.total,
+-      }),
+-    },
+-  ],
+-});
+-
+-// Consumer
+-const consumer = kafka.consumer({ groupId: 'inventory-service' });
+-await consumer.subscribe({ topic: 'order-events' });
+-await consumer.run({
+-  eachMessage: async ({ topic, partition, message }) => {
+-    const event = JSON.parse(message.value.toString());
+-    if (event.type === 'OrderCreated') {
+-      await reserveInventory(event.orderId);
+-    }
+-  },
+-});
+-```
+-
+-**RabbitMQ (Task Queues):**
+-```typescript
+-import amqp from 'amqplib';
+-
+-const connection = await amqp.connect('amqp://localhost');
+-const channel = await connection.createChannel();
+-
+-// Producer
+-await channel.assertQueue('email-queue', { durable: true });
+-channel.sendToQueue('email-queue', Buffer.from(JSON.stringify({
+-  to: user.email,
+-  subject: 'Welcome!',
+-  body: 'Thank you for signing up',
+-})));
+-
+-// Consumer
+-await channel.consume('email-queue', async (msg) => {
+-  const emailData = JSON.parse(msg.content.toString());
+-  await sendEmail(emailData);
+-  channel.ack(msg);
+-});
+-```
+-
+-## CQRS (Command Query Responsibility Segregation)
+-
+-**Concept:** Separate read and write models
+-
+-```
+-Write Side (Commands):           Read Side (Queries):
+-CreateOrder                      GetOrderById
+-UpdateOrder                      GetUserOrders
+-  ↓                                ↑
+-┌─────────┐                    ┌─────────┐
+-│ Write   │ → Events →         │  Read   │
+-│  DB     │    (sync)          │  DB     │
+-│(Postgres)                    │(MongoDB)│
+-└─────────┘                    └─────────┘
+-```
+-
+-**Benefits:**
+-- Optimized read models
+-- Scalable (scale reads independently)
+-- Flexible (different DB for reads/writes)
+-
+-**Implementation:**
+-```typescript
+-// Command (Write)
+-class CreateOrderCommand {
+-  constructor(public userId: string, public items: OrderItem[]) {}
+-}
+-
+-class CreateOrderHandler {
+-  async execute(command: CreateOrderCommand) {
+-    const order = await Order.create(command);
+-    await eventBus.publish(new OrderCreatedEvent(order));
+-    return order.id;
+-  }
+-}
+-
+-// Query (Read)
+-class GetOrderQuery {
+-  constructor(public orderId: string) {}
+-}
+-
+-class GetOrderHandler {
+-  async execute(query: GetOrderQuery) {
+-    // Read from optimized read model
+-    return await OrderReadModel.findById(query.orderId);
+-  }
+-}
+-```
+-
+-## Scalability Patterns
+-
+-### Horizontal Scaling (Scale Out)
+-
+-```
+-Load Balancer
+-    ↓
+-┌───┴───┬───────┬───────┐
+-│ App 1 │ App 2 │ App 3 │ ... App N
+-└───┬───┴───┬───┴───┬───┘
+-    └───────┴───────┘
+-         ↓
+-    Shared Database
+-    (with read replicas)
+-```
+-
+-### Database Sharding
+-
+-**Range-Based Sharding:**
+-```
+-Users 1-1M     → Shard 1
+-Users 1M-2M    → Shard 2
+-Users 2M-3M    → Shard 3
+-```
+-
+-**Hash-Based Sharding:**
+-```typescript
+-function getShardId(userId: string): number {
+-  const hash = crypto.createHash('md5').update(userId).digest('hex');
+-  return parseInt(hash.substring(0, 8), 16) % SHARD_COUNT;
+-}
+-
+-const shardId = getShardId(userId);
+-const db = shards[shardId];
+-const user = await db.users.findById(userId);
+-```
+-
+-### Caching Layers
+-
+-```
+-Client
+-  → CDN (static assets)
+-  → API Gateway Cache (public endpoints)
+-  → Application Cache (Redis - user sessions, hot data)
+-  → Database Query Cache
+-  → Database
+-```
+-
+-## Architecture Decision Matrix
+-
+-| Pattern | When to Use | Complexity | Benefits |
+-|---------|-------------|------------|----------|
+-| **Monolith** | Small team, MVP, unclear boundaries | Low | Simple, fast development |
+-| **Microservices** | Large team, clear domains, need scaling | High | Independent deployment, fault isolation |
+-| **Event-Driven** | Async workflows, audit trail needed | Moderate | Decoupling, scalability |
+-| **CQRS** | Different read/write patterns | High | Optimized queries, scalability |
+-| **Serverless** | Spiky traffic, event-driven | Low | Auto-scaling, pay-per-use |
+-
+-## Anti-Patterns to Avoid
+-
+-1. **Distributed Monolith** - Microservices that all depend on each other
+-2. **Chatty Services** - Too many inter-service calls (network overhead)
+-3. **Shared Database** - Microservices sharing same DB (tight coupling)
+-4. **Over-Engineering** - Using microservices for small apps
+-5. **No Circuit Breakers** - Cascade failures in distributed systems
+-
+-## Architecture Checklist
+-
+-- [ ] Clear service boundaries (domain-driven design)
+-- [ ] Database per service (no shared databases)
+-- [ ] API Gateway for client requests
+-- [ ] Service discovery configured
+-- [ ] Circuit breakers for resilience
+-- [ ] Event-driven communication (Kafka/RabbitMQ)
+-- [ ] CQRS for read-heavy systems
+-- [ ] Distributed tracing (Jaeger/OpenTelemetry)
+-- [ ] Health checks for all services
+-- [ ] Horizontal scaling capability
+-
+-## Resources
+-
+-- **Microservices Patterns:** https://microservices.io/patterns/
+-- **Martin Fowler - Microservices:** https://martinfowler.com/articles/microservices.html
+-- **Event-Driven Architecture:** https://aws.amazon.com/event-driven-architecture/
+-- **CQRS Pattern:** https://martinfowler.com/bliki/CQRS.html
+diff --git a/.opencode/skill/backend-development/references/backend-authentication.md b/.opencode/skill/backend-development/references/backend-authentication.md
+deleted file mode 100644
+index 68571fd..0000000
+--- a/.opencode/skill/backend-development/references/backend-authentication.md
++++ /dev/null
+@@ -1,338 +0,0 @@
+-# Backend Authentication & Authorization
+-
+-Modern authentication patterns including OAuth 2.1, JWT, RBAC, and MFA (2025 standards).
+-
+-## OAuth 2.1 (2025 Standard)
+-
+-### Key Changes from OAuth 2.0
+-
+-**Mandatory:**
+-- PKCE (Proof Key for Code Exchange) for all clients
+-- Exact redirect URI matching
+-- State parameter for CSRF protection
+-
+-**Deprecated:**
+-- Implicit grant flow (security risk)
+-- Resource owner password credentials grant
+-- Bearer token in query strings
+-
+-### Authorization Code Flow with PKCE
+-
+-```typescript
+-// Step 1: Generate code verifier and challenge
+-import crypto from 'crypto';
+-
+-const codeVerifier = crypto.randomBytes(32).toString('base64url');
+-const codeChallenge = crypto
+-  .createHash('sha256')
+-  .update(codeVerifier)
+-  .digest('base64url');
+-
+-// Step 2: Redirect to authorization endpoint
+-const authUrl = new URL('https://auth.example.com/authorize');
+-authUrl.searchParams.set('client_id', 'your-client-id');
+-authUrl.searchParams.set('redirect_uri', 'https://app.example.com/callback');
+-authUrl.searchParams.set('response_type', 'code');
+-authUrl.searchParams.set('scope', 'openid profile email');
+-authUrl.searchParams.set('state', crypto.randomBytes(16).toString('hex'));
+-authUrl.searchParams.set('code_challenge', codeChallenge);
+-authUrl.searchParams.set('code_challenge_method', 'S256');
+-
+-// Step 3: Exchange code for token (with code_verifier)
+-const tokenResponse = await fetch('https://auth.example.com/token', {
+-  method: 'POST',
+-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+-  body: new URLSearchParams({
+-    grant_type: 'authorization_code',
+-    code: authCode,
+-    redirect_uri: redirectUri,
+-    client_id: clientId,
+-    code_verifier: codeVerifier,
+-  }),
+-});
+-```
+-
+-## JWT (JSON Web Tokens)
+-
+-### Structure
+-
+-```
+-Header.Payload.Signature
+-eyJhbGciOi...  .  eyJzdWIiOi...  .  SflKxwRJ...
+-```
+-
+-### Best Practices (2025)
+-
+-1. **Short expiration** - Access tokens: 15 minutes, Refresh tokens: 7 days
+-2. **Use RS256** - Asymmetric signing (not HS256 for public APIs)
+-3. **Validate everything** - Signature, issuer, audience, expiration
+-4. **Include minimal claims** - Don't include sensitive data
+-5. **Refresh token rotation** - Issue new refresh token on each use
+-
+-### Implementation
+-
+-```typescript
+-import jwt from 'jsonwebtoken';
+-
+-// Generate JWT
+-const accessToken = jwt.sign(
+-  {
+-    sub: user.id,
+-    email: user.email,
+-    roles: user.roles,
+-  },
+-  process.env.JWT_PRIVATE_KEY,
+-  {
+-    algorithm: 'RS256',
+-    expiresIn: '15m',
+-    issuer: 'https://api.example.com',
+-    audience: 'https://app.example.com',
+-  }
+-);
+-
+-// Verify JWT
+-const decoded = jwt.verify(token, process.env.JWT_PUBLIC_KEY, {
+-  algorithms: ['RS256'],
+-  issuer: 'https://api.example.com',
+-  audience: 'https://app.example.com',
+-});
+-```
+-
+-## Role-Based Access Control (RBAC)
+-
+-### RBAC Model
+-
+-```
+-Users → Roles → Permissions → Resources
+-```
+-
+-### Implementation (NestJS Example)
+-
+-```typescript
+-// Define roles
+-export enum Role {
+-  ADMIN = 'admin',
+-  EDITOR = 'editor',
+-  VIEWER = 'viewer',
+-}
+-
+-// Role decorator
+-export const Roles = (...roles: Role[]) => SetMetadata('roles', roles);
+-
+-// Guard implementation
+-@Injectable()
+-export class RolesGuard implements CanActivate {
+-  constructor(private reflector: Reflector) {}
+-
+-  canActivate(context: ExecutionContext): boolean {
+-    const requiredRoles = this.reflector.get<Role[]>('roles', context.getHandler());
+-    if (!requiredRoles) return true;
+-
+-    const request = context.switchToHttp().getRequest();
+-    const user = request.user;
+-
+-    return requiredRoles.some((role) => user.roles?.includes(role));
+-  }
+-}
+-
+-// Usage
+-@Post()
+-@UseGuards(JwtAuthGuard, RolesGuard)
+-@Roles(Role.ADMIN, Role.EDITOR)
+-async createPost(@Body() createPostDto: CreatePostDto) {
+-  return this.postsService.create(createPostDto);
+-}
+-```
+-
+-### RBAC Best Practices
+-
+-1. **Deny by default** - Explicitly grant permissions
+-2. **Least privilege** - Minimum permissions needed
+-3. **Role hierarchy** - Admin inherits Editor inherits Viewer
+-4. **Separate roles and permissions** - Flexible permission assignment
+-5. **Audit trail** - Log role changes and access
+-
+-## Multi-Factor Authentication (MFA)
+-
+-### TOTP (Time-Based One-Time Password)
+-
+-```typescript
+-import speakeasy from 'speakeasy';
+-import QRCode from 'qrcode';
+-
+-// Generate secret
+-const secret = speakeasy.generateSecret({
+-  name: 'MyApp',
+-  issuer: 'MyCompany',
+-});
+-
+-// Generate QR code for user
+-const qrCode = await QRCode.toDataURL(secret.otpauth_url);
+-
+-// Verify TOTP token
+-const verified = speakeasy.totp.verify({
+-  secret: secret.base32,
+-  encoding: 'base32',
+-  token: userToken,
+-  window: 2, // Allow 2 time steps drift
+-});
+-```
+-
+-### FIDO2/WebAuthn (Passwordless - 2025 Standard)
+-
+-**Benefits:**
+-- Phishing-resistant
+-- No shared secrets
+-- Hardware-backed security
+-- Better UX (biometrics, security keys)
+-
+-**Implementation:**
+-```typescript
+-// Registration
+-const publicKeyCredentialCreationOptions = {
+-  challenge: crypto.randomBytes(32),
+-  rp: { name: 'MyApp', id: 'example.com' },
+-  user: {
+-    id: Buffer.from(user.id),
+-    name: user.email,
+-    displayName: user.name,
+-  },
+-  pubKeyCredParams: [{ alg: -7, type: 'public-key' }], // ES256
+-  authenticatorSelection: {
+-    authenticatorAttachment: 'platform', // 'platform' or 'cross-platform'
+-    userVerification: 'required',
+-  },
+-  timeout: 60000,
+-  attestation: 'direct',
+-};
+-
+-// Use @simplewebauthn/server library
+-import { verifyRegistrationResponse, verifyAuthenticationResponse } from '@simplewebauthn/server';
+-```
+-
+-## Session Management
+-
+-### Best Practices
+-
+-1. **Secure cookies** - HttpOnly, Secure, SameSite=Strict
+-2. **Session timeout** - Idle: 15 minutes, Absolute: 8 hours
+-3. **Regenerate session ID** - After login, privilege elevation
+-4. **Server-side storage** - Redis for distributed systems
+-5. **CSRF protection** - SameSite cookies + CSRF tokens
+-
+-### Implementation
+-
+-```typescript
+-import session from 'express-session';
+-import RedisStore from 'connect-redis';
+-import { createClient } from 'redis';
+-
+-const redisClient = createClient();
+-await redisClient.connect();
+-
+-app.use(
+-  session({
+-    store: new RedisStore({ client: redisClient }),
+-    secret: process.env.SESSION_SECRET,
+-    resave: false,
+-    saveUninitialized: false,
+-    cookie: {
+-      secure: true, // HTTPS only
+-      httpOnly: true, // No JavaScript access
+-      sameSite: 'strict', // CSRF protection
+-      maxAge: 1000 * 60 * 15, // 15 minutes
+-    },
+-  })
+-);
+-```
+-
+-## Password Security
+-
+-### Argon2id (2025 Standard - Replaces bcrypt)
+-
+-**Why Argon2id:**
+-- Winner of Password Hashing Competition (2015)
+-- Memory-hard (resistant to GPU/ASIC attacks)
+-- Configurable CPU and memory cost
+-- Combines Argon2i (data-independent) + Argon2d (data-dependent)
+-
+-```typescript
+-import argon2 from 'argon2';
+-
+-// Hash password
+-const hash = await argon2.hash('password123', {
+-  type: argon2.argon2id,
+-  memoryCost: 65536, // 64 MB
+-  timeCost: 3, // 3 iterations
+-  parallelism: 4, // 4 threads
+-});
+-
+-// Verify password
+-const valid = await argon2.verify(hash, 'password123');
+-```
+-
+-### Password Policy (2025 NIST Guidelines)
+-
+-- **Minimum length:** 12 characters (not 8)
+-- **No composition rules** - Allow passphrases
+-- **Check against breach databases** - HaveIBeenPwned API
+-- **No periodic rotation** - Only on compromise
+-- **Allow all printable characters** - Including spaces, emojis
+-
+-## API Key Authentication
+-
+-### Best Practices
+-
+-1. **Prefix keys** - `sk_live_`, `pk_test_` (identify type/environment)
+-2. **Hash stored keys** - Store SHA-256 hash, not plaintext
+-3. **Key rotation** - Allow users to rotate keys
+-4. **Scope limiting** - Separate keys for read/write operations
+-5. **Rate limiting** - Per API key limits
+-
+-```typescript
+-// Generate API key
+-const apiKey = `sk_${env}_${crypto.randomBytes(24).toString('base64url')}`;
+-
+-// Store hashed version
+-const hashedKey = crypto.createHash('sha256').update(apiKey).digest('hex');
+-await db.apiKeys.create({ userId, hashedKey, scopes: ['read'] });
+-
+-// Validate API key
+-const providedHash = crypto.createHash('sha256').update(providedKey).digest('hex');
+-const keyRecord = await db.apiKeys.findOne({ hashedKey: providedHash });
+-```
+-
+-## Authentication Decision Matrix
+-
+-| Use Case | Recommended Approach |
+-|----------|---------------------|
+-| Web application | OAuth 2.1 + JWT |
+-| Mobile app | OAuth 2.1 + PKCE |
+-| SPA (Single Page App) | OAuth 2.1 Authorization Code + PKCE |
+-| Server-to-server | Client credentials grant + mTLS |
+-| Third-party API access | API keys with scopes |
+-| High-security | WebAuthn/FIDO2 + MFA |
+-| Internal admin | JWT + RBAC + MFA |
+-| Microservices | Service mesh (mTLS) + JWT |
+-
+-## Security Checklist
+-
+-- [ ] OAuth 2.1 with PKCE implemented
+-- [ ] JWT tokens expire in 15 minutes
+-- [ ] Refresh token rotation enabled
+-- [ ] RBAC with deny-by-default
+-- [ ] MFA required for admin accounts
+-- [ ] Passwords hashed with Argon2id
+-- [ ] Session cookies: HttpOnly, Secure, SameSite
+-- [ ] Rate limiting on auth endpoints (10 attempts/15 min)
+-- [ ] Account lockout after failed attempts
+-- [ ] Password policy: 12+ chars, breach check
+-- [ ] Audit logging for authentication events
+-
+-## Resources
+-
+-- **OAuth 2.1:** https://oauth.net/2.1/
+-- **JWT Best Practices:** https://datatracker.ietf.org/doc/html/rfc8725
+-- **WebAuthn:** https://webauthn.guide/
+-- **NIST Password Guidelines:** https://pages.nist.gov/800-63-3/
+-- **OWASP Auth Cheat Sheet:** https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+diff --git a/.opencode/skill/backend-development/references/backend-code-quality.md b/.opencode/skill/backend-development/references/backend-code-quality.md
+deleted file mode 100644
+index 8403116..0000000
+--- a/.opencode/skill/backend-development/references/backend-code-quality.md
++++ /dev/null
+@@ -1,659 +0,0 @@
+-# Backend Code Quality
+-
+-SOLID principles, design patterns, clean code practices, and refactoring strategies (2025).
+-
+-## SOLID Principles
+-
+-### Single Responsibility Principle (SRP)
+-
+-**Concept:** Class/module should have one reason to change
+-
+-**Bad:**
+-```typescript
+-class User {
+-  saveToDatabase() { /* ... */ }
+-  sendWelcomeEmail() { /* ... */ }
+-  generateReport() { /* ... */ }
+-  validateInput() { /* ... */ }
+-}
+-```
+-
+-**Good:**
+-```typescript
+-class User {
+-  constructor(public id: string, public email: string, public name: string) {}
+-}
+-
+-class UserRepository {
+-  async save(user: User) { /* ... */ }
+-  async findById(id: string) { /* ... */ }
+-}
+-
+-class EmailService {
+-  async sendWelcomeEmail(user: User) { /* ... */ }
+-}
+-
+-class UserValidator {
+-  validate(userData: any) { /* ... */ }
+-}
+-
+-class ReportGenerator {
+-  generateUserReport(user: User) { /* ... */ }
+-}
+-```
+-
+-### Open/Closed Principle (OCP)
+-
+-**Concept:** Open for extension, closed for modification
+-
+-**Bad:**
+-```typescript
+-class PaymentProcessor {
+-  process(amount: number, method: string) {
+-    if (method === 'stripe') {
+-      // Stripe logic
+-    } else if (method === 'paypal') {
+-      // PayPal logic
+-    }
+-    // Adding new payment method requires modifying this class
+-  }
+-}
+-```
+-
+-**Good (Strategy Pattern):**
+-```typescript
+-interface PaymentStrategy {
+-  process(amount: number): Promise<PaymentResult>;
+-}
+-
+-class StripePayment implements PaymentStrategy {
+-  async process(amount: number) {
+-    // Stripe-specific logic
+-    return { success: true, transactionId: '...' };
+-  }
+-}
+-
+-class PayPalPayment implements PaymentStrategy {
+-  async process(amount: number) {
+-    // PayPal-specific logic
+-    return { success: true, transactionId: '...' };
+-  }
+-}
+-
+-class PaymentProcessor {
+-  constructor(private strategy: PaymentStrategy) {}
+-
+-  async process(amount: number) {
+-    return this.strategy.process(amount);
+-  }
+-}
+-
+-// Usage
+-const processor = new PaymentProcessor(new StripePayment());
+-await processor.process(100);
+-```
+-
+-### Liskov Substitution Principle (LSP)
+-
+-**Concept:** Subtypes must be substitutable for base types
+-
+-**Bad:**
+-```typescript
+-class Bird {
+-  fly() { /* ... */ }
+-}
+-
+-class Penguin extends Bird {
+-  fly() {
+-    throw new Error('Penguins cannot fly!');
+-  }
+-}
+-
+-// Violates LSP - Penguin breaks Bird contract
+-```
+-
+-**Good:**
+-```typescript
+-interface Bird {
+-  move(): void;
+-}
+-
+-class FlyingBird implements Bird {
+-  move() {
+-    this.fly();
+-  }
+-  private fly() { /* ... */ }
+-}
+-
+-class Penguin implements Bird {
+-  move() {
+-    this.swim();
+-  }
+-  private swim() { /* ... */ }
+-}
+-```
+-
+-### Interface Segregation Principle (ISP)
+-
+-**Concept:** Clients shouldn't depend on interfaces they don't use
+-
+-**Bad:**
+-```typescript
+-interface Worker {
+-  work(): void;
+-  eat(): void;
+-  sleep(): void;
+-}
+-
+-class Robot implements Worker {
+-  work() { /* ... */ }
+-  eat() { throw new Error('Robots don't eat'); }
+-  sleep() { throw new Error('Robots don't sleep'); }
+-}
+-```
+-
+-**Good:**
+-```typescript
+-interface Workable {
+-  work(): void;
+-}
+-
+-interface Eatable {
+-  eat(): void;
+-}
+-
+-interface Sleepable {
+-  sleep(): void;
+-}
+-
+-class Human implements Workable, Eatable, Sleepable {
+-  work() { /* ... */ }
+-  eat() { /* ... */ }
+-  sleep() { /* ... */ }
+-}
+-
+-class Robot implements Workable {
+-  work() { /* ... */ }
+-}
+-```
+-
+-### Dependency Inversion Principle (DIP)
+-
+-**Concept:** Depend on abstractions, not concretions
+-
+-**Bad:**
+-```typescript
+-class MySQLDatabase {
+-  query(sql: string) { /* ... */ }
+-}
+-
+-class UserService {
+-  private db = new MySQLDatabase(); // Tight coupling
+-
+-  async getUser(id: string) {
+-    return this.db.query(`SELECT * FROM users WHERE id = ${id}`);
+-  }
+-}
+-```
+-
+-**Good (Dependency Injection):**
+-```typescript
+-interface Database {
+-  query(sql: string, params: any[]): Promise<any>;
+-}
+-
+-class MySQLDatabase implements Database {
+-  async query(sql: string, params: any[]) { /* ... */ }
+-}
+-
+-class PostgreSQLDatabase implements Database {
+-  async query(sql: string, params: any[]) { /* ... */ }
+-}
+-
+-class UserService {
+-  constructor(private db: Database) {} // Injected dependency
+-
+-  async getUser(id: string) {
+-    return this.db.query('SELECT * FROM users WHERE id = $1', [id]);
+-  }
+-}
+-
+-// Usage
+-const db = new PostgreSQLDatabase();
+-const userService = new UserService(db);
+-```
+-
+-## Design Patterns
+-
+-### Repository Pattern
+-
+-**Concept:** Abstraction layer between business logic and data access
+-
+-```typescript
+-// Domain entity
+-class User {
+-  constructor(
+-    public id: string,
+-    public email: string,
+-    public name: string,
+-  ) {}
+-}
+-
+-// Repository interface
+-interface UserRepository {
+-  findById(id: string): Promise<User | null>;
+-  findByEmail(email: string): Promise<User | null>;
+-  save(user: User): Promise<void>;
+-  delete(id: string): Promise<void>;
+-}
+-
+-// Implementation
+-class PostgresUserRepository implements UserRepository {
+-  constructor(private db: Database) {}
+-
+-  async findById(id: string): Promise<User | null> {
+-    const row = await this.db.query('SELECT * FROM users WHERE id = $1', [id]);
+-    return row ? new User(row.id, row.email, row.name) : null;
+-  }
+-
+-  async save(user: User): Promise<void> {
+-    await this.db.query(
+-      'INSERT INTO users (id, email, name) VALUES ($1, $2, $3)',
+-      [user.id, user.email, user.name]
+-    );
+-  }
+-
+-  // Other methods...
+-}
+-
+-// Service layer uses repository
+-class UserService {
+-  constructor(private userRepo: UserRepository) {}
+-
+-  async getUser(id: string) {
+-    return this.userRepo.findById(id);
+-  }
+-}
+-```
+-
+-### Factory Pattern
+-
+-**Concept:** Create objects without specifying exact class
+-
+-```typescript
+-interface Notification {
+-  send(message: string): Promise<void>;
+-}
+-
+-class EmailNotification implements Notification {
+-  async send(message: string) {
+-    console.log(`Email sent: ${message}`);
+-  }
+-}
+-
+-class SMSNotification implements Notification {
+-  async send(message: string) {
+-    console.log(`SMS sent: ${message}`);
+-  }
+-}
+-
+-class PushNotification implements Notification {
+-  async send(message: string) {
+-    console.log(`Push notification sent: ${message}`);
+-  }
+-}
+-
+-class NotificationFactory {
+-  static create(type: 'email' | 'sms' | 'push'): Notification {
+-    switch (type) {
+-      case 'email':
+-        return new EmailNotification();
+-      case 'sms':
+-        return new SMSNotification();
+-      case 'push':
+-        return new PushNotification();
+-      default:
+-        throw new Error(`Unknown notification type: ${type}`);
+-    }
+-  }
+-}
+-
+-// Usage
+-const notification = NotificationFactory.create('email');
+-await notification.send('Hello!');
+-```
+-
+-### Decorator Pattern
+-
+-**Concept:** Add behavior to objects dynamically
+-
+-```typescript
+-interface Coffee {
+-  cost(): number;
+-  description(): string;
+-}
+-
+-class SimpleCoffee implements Coffee {
+-  cost() {
+-    return 10;
+-  }
+-
+-  description() {
+-    return 'Simple coffee';
+-  }
+-}
+-
+-class MilkDecorator implements Coffee {
+-  constructor(private coffee: Coffee) {}
+-
+-  cost() {
+-    return this.coffee.cost() + 2;
+-  }
+-
+-  description() {
+-    return `${this.coffee.description()}, milk`;
+-  }
+-}
+-
+-class SugarDecorator implements Coffee {
+-  constructor(private coffee: Coffee) {}
+-
+-  cost() {
+-    return this.coffee.cost() + 1;
+-  }
+-
+-  description() {
+-    return `${this.coffee.description()}, sugar`;
+-  }
+-}
+-
+-// Usage
+-let coffee: Coffee = new SimpleCoffee();
+-coffee = new MilkDecorator(coffee);
+-coffee = new SugarDecorator(coffee);
+-
+-console.log(coffee.description()); // "Simple coffee, milk, sugar"
+-console.log(coffee.cost()); // 13
+-```
+-
+-### Observer Pattern (Pub/Sub)
+-
+-**Concept:** Notify multiple objects about state changes
+-
+-```typescript
+-interface Observer {
+-  update(event: any): void;
+-}
+-
+-class EventEmitter {
+-  private observers: Map<string, Observer[]> = new Map();
+-
+-  subscribe(event: string, observer: Observer) {
+-    if (!this.observers.has(event)) {
+-      this.observers.set(event, []);
+-    }
+-    this.observers.get(event)!.push(observer);
+-  }
+-
+-  emit(event: string, data: any) {
+-    const observers = this.observers.get(event) || [];
+-    observers.forEach(observer => observer.update(data));
+-  }
+-}
+-
+-// Observers
+-class EmailNotifier implements Observer {
+-  update(event: any) {
+-    console.log(`Sending email about: ${event.type}`);
+-  }
+-}
+-
+-class LoggerObserver implements Observer {
+-  update(event: any) {
+-    console.log(`Logging event: ${JSON.stringify(event)}`);
+-  }
+-}
+-
+-// Usage
+-const eventEmitter = new EventEmitter();
+-eventEmitter.subscribe('user.created', new EmailNotifier());
+-eventEmitter.subscribe('user.created', new LoggerObserver());
+-
+-eventEmitter.emit('user.created', { type: 'user.created', userId: '123' });
+-```
+-
+-## Clean Code Practices
+-
+-### Meaningful Names
+-
+-**Bad:**
+-```typescript
+-function d(a: number, b: number) {
+-  return a * b * 0.0254;
+-}
+-```
+-
+-**Good:**
+-```typescript
+-function calculateAreaInMeters(widthInInches: number, heightInInches: number) {
+-  const INCHES_TO_METERS = 0.0254;
+-  return widthInInches * heightInInches * INCHES_TO_METERS;
+-}
+-```
+-
+-### Small Functions
+-
+-**Bad:**
+-```typescript
+-async function processOrder(orderId: string) {
+-  // 200 lines of code doing everything
+-  // - validate order
+-  // - check inventory
+-  // - process payment
+-  // - update database
+-  // - send notifications
+-  // - generate invoice
+-}
+-```
+-
+-**Good:**
+-```typescript
+-async function processOrder(orderId: string) {
+-  const order = await validateOrder(orderId);
+-  await checkInventory(order);
+-  const payment = await processPayment(order);
+-  await updateOrderStatus(orderId, 'paid');
+-  await sendConfirmationEmail(order);
+-  await generateInvoice(order, payment);
+-}
+-```
+-
+-### Avoid Magic Numbers
+-
+-**Bad:**
+-```typescript
+-if (user.age < 18) {
+-  throw new Error('Too young');
+-}
+-
+-setTimeout(fetchData, 86400000);
+-```
+-
+-**Good:**
+-```typescript
+-const MINIMUM_AGE = 18;
+-if (user.age < MINIMUM_AGE) {
+-  throw new Error('Too young');
+-}
+-
+-const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+-setTimeout(fetchData, ONE_DAY_IN_MS);
+-```
+-
+-### Error Handling
+-
+-**Bad:**
+-```typescript
+-try {
+-  const user = await db.findUser(id);
+-  return user;
+-} catch (e) {
+-  console.log(e);
+-  return null;
+-}
+-```
+-
+-**Good:**
+-```typescript
+-try {
+-  const user = await db.findUser(id);
+-  if (!user) {
+-    throw new UserNotFoundError(id);
+-  }
+-  return user;
+-} catch (error) {
+-  logger.error('Failed to fetch user', {
+-    userId: id,
+-    error: error.message,
+-    stack: error.stack,
+-  });
+-  throw new DatabaseError('User fetch failed', { cause: error });
+-}
+-```
+-
+-### Don't Repeat Yourself (DRY)
+-
+-**Bad:**
+-```typescript
+-app.post('/api/users', async (req, res) => {
+-  if (!req.body.email || !req.body.email.includes('@')) {
+-    return res.status(400).json({ error: 'Invalid email' });
+-  }
+-  // ...
+-});
+-
+-app.put('/api/users/:id', async (req, res) => {
+-  if (!req.body.email || !req.body.email.includes('@')) {
+-    return res.status(400).json({ error: 'Invalid email' });
+-  }
+-  // ...
+-});
+-```
+-
+-**Good:**
+-```typescript
+-function validateEmail(email: string) {
+-  if (!email || !email.includes('@')) {
+-    throw new ValidationError('Invalid email');
+-  }
+-}
+-
+-app.post('/api/users', async (req, res) => {
+-  validateEmail(req.body.email);
+-  // ...
+-});
+-
+-app.put('/api/users/:id', async (req, res) => {
+-  validateEmail(req.body.email);
+-  // ...
+-});
+-```
+-
+-## Code Refactoring Techniques
+-
+-### Extract Method
+-
+-**Before:**
+-```typescript
+-function renderOrder(order: Order) {
+-  console.log('Order Details:');
+-  console.log(`ID: ${order.id}`);
+-  console.log(`Total: $${order.total}`);
+-
+-  console.log('Items:');
+-  order.items.forEach(item => {
+-    console.log(`- ${item.name}: $${item.price}`);
+-  });
+-}
+-```
+-
+-**After:**
+-```typescript
+-function renderOrder(order: Order) {
+-  printOrderHeader(order);
+-  printOrderItems(order.items);
+-}
+-
+-function printOrderHeader(order: Order) {
+-  console.log('Order Details:');
+-  console.log(`ID: ${order.id}`);
+-  console.log(`Total: $${order.total}`);
+-}
+-
+-function printOrderItems(items: OrderItem[]) {
+-  console.log('Items:');
+-  items.forEach(item => {
+-    console.log(`- ${item.name}: $${item.price}`);
+-  });
+-}
+-```
+-
+-### Replace Conditional with Polymorphism
+-
+-**Before:**
+-```typescript
+-function getShippingCost(order: Order) {
+-  if (order.shippingMethod === 'standard') {
+-    return 5;
+-  } else if (order.shippingMethod === 'express') {
+-    return 15;
+-  } else if (order.shippingMethod === 'overnight') {
+-    return 30;
+-  }
+-}
+-```
+-
+-**After:**
+-```typescript
+-interface ShippingMethod {
+-  getCost(): number;
+-}
+-
+-class StandardShipping implements ShippingMethod {
+-  getCost() {
+-    return 5;
+-  }
+-}
+-
+-class ExpressShipping implements ShippingMethod {
+-  getCost() {
+-    return 15;
+-  }
+-}
+-
+-class OvernightShipping implements ShippingMethod {
+-  getCost() {
+-    return 30;
+-  }
+-}
+-```
+-
+-## Code Quality Checklist
+-
+-- [ ] SOLID principles applied
+-- [ ] Functions are small (< 20 lines ideal)
+-- [ ] Meaningful variable/function names
+-- [ ] No magic numbers (use constants)
+-- [ ] Proper error handling (no silent failures)
+-- [ ] DRY (no code duplication)
+-- [ ] Comments explain "why", not "what"
+-- [ ] Design patterns used appropriately
+-- [ ] Dependency injection for testability
+-- [ ] Code is readable (readable > clever)
+-
+-## Resources
+-
+-- **Clean Code (Book):** Robert C. Martin
+-- **Refactoring (Book):** Martin Fowler
+-- **Design Patterns:** https://refactoring.guru/design-patterns
+-- **SOLID Principles:** https://en.wikipedia.org/wiki/SOLID
+diff --git a/.opencode/skill/backend-development/references/backend-debugging.md b/.opencode/skill/backend-development/references/backend-debugging.md
+deleted file mode 100644
+index 56f2927..0000000
+--- a/.opencode/skill/backend-development/references/backend-debugging.md
++++ /dev/null
+@@ -1,904 +0,0 @@
+-# Backend Debugging Strategies
+-
+-Comprehensive debugging techniques, tools, and best practices for backend systems (2025).
+-
+-## Debugging Mindset
+-
+-### The Scientific Method for Debugging
+-
+-1. **Observe** - Gather symptoms and data
+-2. **Hypothesize** - Form theories about the cause
+-3. **Test** - Verify or disprove theories
+-4. **Iterate** - Refine understanding
+-5. **Fix** - Apply solution
+-6. **Verify** - Confirm fix works
+-
+-### Golden Rules
+-
+-1. **Reproduce first** - Debugging without reproduction is guessing
+-2. **Simplify the problem** - Isolate variables
+-3. **Read the logs** - Error messages contain clues
+-4. **Check assumptions** - "It should work" isn't debugging
+-5. **Use scientific method** - Avoid random changes
+-6. **Document findings** - Future you will thank you
+-
+-## Logging Best Practices
+-
+-### Structured Logging
+-
+-**Node.js (Pino - Fastest)**
+-```typescript
+-import pino from 'pino';
+-
+-const logger = pino({
+-  level: process.env.LOG_LEVEL || 'info',
+-  transport: {
+-    target: 'pino-pretty',
+-    options: { colorize: true }
+-  }
+-});
+-
+-// Structured logging with context
+-logger.info({ userId: '123', action: 'login' }, 'User logged in');
+-
+-// Error logging with stack trace
+-try {
+-  await riskyOperation();
+-} catch (error) {
+-  logger.error({ err: error, userId: '123' }, 'Operation failed');
+-}
+-```
+-
+-**Python (Structlog)**
+-```python
+-import structlog
+-
+-logger = structlog.get_logger()
+-
+-# Structured context
+-logger.info("user_login", user_id="123", ip="192.168.1.1")
+-
+-# Error with exception
+-try:
+-    risky_operation()
+-except Exception as e:
+-    logger.error("operation_failed", user_id="123", exc_info=True)
+-```
+-
+-**Go (Zap - High Performance)**
+-```go
+-import "go.uber.org/zap"
+-
+-logger, _ := zap.NewProduction()
+-defer logger.Sync()
+-
+-// Structured fields
+-logger.Info("user logged in",
+-    zap.String("user_id", "123"),
+-    zap.String("ip", "192.168.1.1"),
+-)
+-
+-// Error logging
+-if err := riskyOperation(); err != nil {
+-    logger.Error("operation failed",
+-        zap.Error(err),
+-        zap.String("user_id", "123"),
+-    )
+-}
+-```
+-
+-### Log Levels
+-
+-| Level | Purpose | Example |
+-|-------|---------|---------|
+-| **TRACE** | Very detailed, dev only | Request/response bodies |
+-| **DEBUG** | Detailed info for debugging | SQL queries, cache hits |
+-| **INFO** | General informational | User login, API calls |
+-| **WARN** | Potential issues | Deprecated API usage |
+-| **ERROR** | Error conditions | Failed API calls, exceptions |
+-| **FATAL** | Critical failures | Database connection lost |
+-
+-### What to Log
+-
+-**✅ DO LOG:**
+-- Request/response metadata (not bodies in prod)
+-- Error messages with context
+-- Performance metrics (duration, size)
+-- Security events (login, permission changes)
+-- Business events (orders, payments)
+-
+-**❌ DON'T LOG:**
+-- Passwords or secrets
+-- Credit card numbers
+-- Personal identifiable information (PII)
+-- Session tokens
+-- Full request bodies in production
+-
+-## Debugging Tools by Language
+-
+-### Node.js / TypeScript
+-
+-**1. Chrome DevTools (Built-in)**
+-```bash
+-# Run with inspect flag
+-node --inspect-brk app.js
+-
+-# Open chrome://inspect in Chrome
+-# Set breakpoints, step through code
+-```
+-
+-**2. VS Code Debugger**
+-```json
+-// .vscode/launch.json
+-{
+-  "version": "0.2.0",
+-  "configurations": [
+-    {
+-      "type": "node",
+-      "request": "launch",
+-      "name": "Debug Server",
+-      "skipFiles": ["<node_internals>/**"],
+-      "program": "${workspaceFolder}/src/index.ts",
+-      "preLaunchTask": "npm: build",
+-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+-    }
+-  ]
+-}
+-```
+-
+-**3. Debug Module**
+-```typescript
+-import debug from 'debug';
+-
+-const log = debug('app:server');
+-const error = debug('app:error');
+-
+-log('Starting server on port %d', 3000);
+-error('Failed to connect to database');
+-
+-// Run with: DEBUG=app:* node app.js
+-```
+-
+-### Python
+-
+-**1. PDB (Built-in Debugger)**
+-```python
+-import pdb
+-
+-def problematic_function(data):
+-    # Set breakpoint
+-    pdb.set_trace()
+-
+-    # Debugger commands:
+-    # l - list code
+-    # n - next line
+-    # s - step into
+-    # c - continue
+-    # p variable - print variable
+-    # q - quit
+-    result = process(data)
+-    return result
+-```
+-
+-**2. IPython Debugger (Better)**
+-```python
+-from IPython import embed
+-
+-def problematic_function(data):
+-    # Drop into IPython shell
+-    embed()
+-
+-    result = process(data)
+-    return result
+-```
+-
+-**3. VS Code Debugger**
+-```json
+-// .vscode/launch.json
+-{
+-  "version": "0.2.0",
+-  "configurations": [
+-    {
+-      "name": "Python: FastAPI",
+-      "type": "python",
+-      "request": "launch",
+-      "module": "uvicorn",
+-      "args": ["main:app", "--reload"],
+-      "jinja": true
+-    }
+-  ]
+-}
+-```
+-
+-### Go
+-
+-**1. Delve (Standard Debugger)**
+-```bash
+-# Install
+-go install github.com/go-delve/delve/cmd/dlv@latest
+-
+-# Debug
+-dlv debug main.go
+-
+-# Commands:
+-# b main.main - set breakpoint
+-# c - continue
+-# n - next line
+-# s - step into
+-# p variable - print variable
+-# q - quit
+-```
+-
+-**2. VS Code Debugger**
+-```json
+-// .vscode/launch.json
+-{
+-  "version": "0.2.0",
+-  "configurations": [
+-    {
+-      "name": "Launch Package",
+-      "type": "go",
+-      "request": "launch",
+-      "mode": "debug",
+-      "program": "${workspaceFolder}"
+-    }
+-  ]
+-}
+-```
+-
+-### Rust
+-
+-**1. LLDB/GDB (Native Debuggers)**
+-```bash
+-# Build with debug info
+-cargo build
+-
+-# Debug with LLDB
+-rust-lldb ./target/debug/myapp
+-
+-# Debug with GDB
+-rust-gdb ./target/debug/myapp
+-```
+-
+-**2. VS Code Debugger (CodeLLDB)**
+-```json
+-// .vscode/launch.json
+-{
+-  "version": "0.2.0",
+-  "configurations": [
+-    {
+-      "type": "lldb",
+-      "request": "launch",
+-      "name": "Debug",
+-      "program": "${workspaceFolder}/target/debug/myapp",
+-      "args": [],
+-      "cwd": "${workspaceFolder}"
+-    }
+-  ]
+-}
+-```
+-
+-## Database Debugging
+-
+-### SQL Query Debugging (PostgreSQL)
+-
+-**1. EXPLAIN ANALYZE**
+-```sql
+--- Show query execution plan and actual timings
+-EXPLAIN ANALYZE
+-SELECT u.name, COUNT(o.id) as order_count
+-FROM users u
+-LEFT JOIN orders o ON u.id = o.user_id
+-WHERE u.created_at > '2024-01-01'
+-GROUP BY u.id, u.name
+-ORDER BY order_count DESC
+-LIMIT 10;
+-
+--- Look for:
+--- - Seq Scan on large tables (missing indexes)
+--- - High execution time
+--- - Large row estimates
+-```
+-
+-**2. Enable Slow Query Logging**
+-```sql
+--- PostgreSQL configuration
+-ALTER DATABASE mydb SET log_min_duration_statement = 1000; -- Log queries >1s
+-
+--- Check slow queries
+-SELECT query, calls, total_exec_time, mean_exec_time
+-FROM pg_stat_statements
+-ORDER BY mean_exec_time DESC
+-LIMIT 10;
+-```
+-
+-**3. Active Query Monitoring**
+-```sql
+--- See currently running queries
+-SELECT pid, now() - query_start as duration, query, state
+-FROM pg_stat_activity
+-WHERE state = 'active'
+-ORDER BY duration DESC;
+-
+--- Kill a long-running query
+-SELECT pg_terminate_backend(pid);
+-```
+-
+-### MongoDB Debugging
+-
+-**1. Explain Query Performance**
+-```javascript
+-db.users.find({ email: 'test@example.com' }).explain('executionStats')
+-
+-// Look for:
+-// - totalDocsExamined vs nReturned (should be close)
+-// - COLLSCAN (collection scan - needs index)
+-// - executionTimeMillis (should be low)
+-```
+-
+-**2. Profile Slow Queries**
+-```javascript
+-// Enable profiling for queries >100ms
+-db.setProfilingLevel(1, { slowms: 100 })
+-
+-// View slow queries
+-db.system.profile.find().limit(5).sort({ ts: -1 }).pretty()
+-
+-// Disable profiling
+-db.setProfilingLevel(0)
+-```
+-
+-### Redis Debugging
+-
+-**1. Monitor Commands**
+-```bash
+-# See all commands in real-time
+-redis-cli MONITOR
+-
+-# Check slow log
+-redis-cli SLOWLOG GET 10
+-
+-# Set slow log threshold (microseconds)
+-redis-cli CONFIG SET slowlog-log-slower-than 10000
+-```
+-
+-**2. Memory Analysis**
+-```bash
+-# Memory usage by key pattern
+-redis-cli --bigkeys
+-
+-# Memory usage details
+-redis-cli INFO memory
+-
+-# Analyze specific key
+-redis-cli MEMORY USAGE mykey
+-```
+-
+-## API Debugging
+-
+-### HTTP Request Debugging
+-
+-**1. cURL Testing**
+-```bash
+-# Verbose output with headers
+-curl -v https://api.example.com/users
+-
+-# Include response headers
+-curl -i https://api.example.com/users
+-
+-# POST with JSON
+-curl -X POST https://api.example.com/users \
+-  -H "Content-Type: application/json" \
+-  -d '{"name":"John","email":"john@example.com"}' \
+-  -v
+-
+-# Save response to file
+-curl https://api.example.com/users -o response.json
+-```
+-
+-**2. HTTPie (User-Friendly)**
+-```bash
+-# Install
+-pip install httpie
+-
+-# Simple GET
+-http GET https://api.example.com/users
+-
+-# POST with JSON
+-http POST https://api.example.com/users name=John email=john@example.com
+-
+-# Custom headers
+-http GET https://api.example.com/users Authorization:"Bearer token123"
+-```
+-
+-**3. Request Logging Middleware**
+-
+-**Express/Node.js:**
+-```typescript
+-import morgan from 'morgan';
+-
+-// Development
+-app.use(morgan('dev'));
+-
+-// Production (JSON format)
+-app.use(morgan('combined'));
+-
+-// Custom format
+-app.use(morgan(':method :url :status :response-time ms - :res[content-length]'));
+-```
+-
+-**FastAPI/Python:**
+-```python
+-from fastapi import Request
+-import time
+-
+-@app.middleware("http")
+-async def log_requests(request: Request, call_next):
+-    start_time = time.time()
+-    response = await call_next(request)
+-    duration = time.time() - start_time
+-
+-    logger.info(
+-        "request_processed",
+-        method=request.method,
+-        path=request.url.path,
+-        status_code=response.status_code,
+-        duration_ms=duration * 1000
+-    )
+-    return response
+-```
+-
+-## Performance Debugging
+-
+-### CPU Profiling
+-
+-**Node.js (0x)**
+-```bash
+-# Install
+-npm install -g 0x
+-
+-# Profile application
+-0x node app.js
+-
+-# Open flamegraph in browser
+-# Identify hot spots (red areas)
+-```
+-
+-**Node.js (Clinic.js)**
+-```bash
+-# Install
+-npm install -g clinic
+-
+-# CPU profiling
+-clinic doctor -- node app.js
+-
+-# Heap profiling
+-clinic heapprofiler -- node app.js
+-
+-# Event loop analysis
+-clinic bubbleprof -- node app.js
+-```
+-
+-**Python (cProfile)**
+-```python
+-import cProfile
+-import pstats
+-
+-# Profile function
+-profiler = cProfile.Profile()
+-profiler.enable()
+-
+-# Your code
+-result = expensive_operation()
+-
+-profiler.disable()
+-stats = pstats.Stats(profiler)
+-stats.sort_stats('cumulative')
+-stats.print_stats(10)  # Top 10 functions
+-```
+-
+-**Go (pprof)**
+-```go
+-import (
+-    "net/http"
+-    _ "net/http/pprof"
+-)
+-
+-func main() {
+-    // Enable profiling endpoint
+-    go func() {
+-        http.ListenAndServe("localhost:6060", nil)
+-    }()
+-
+-    // Your application
+-    startServer()
+-}
+-
+-// Profile CPU
+-// go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
+-
+-// Profile heap
+-// go tool pprof http://localhost:6060/debug/pprof/heap
+-```
+-
+-### Memory Debugging
+-
+-**Node.js (Heap Snapshots)**
+-```typescript
+-// Take heap snapshot programmatically
+-import { writeHeapSnapshot } from 'v8';
+-
+-app.get('/debug/heap', (req, res) => {
+-    const filename = writeHeapSnapshot();
+-    res.send(`Heap snapshot written to ${filename}`);
+-});
+-
+-// Analyze in Chrome DevTools
+-// 1. Load heap snapshot
+-// 2. Compare snapshots to find memory leaks
+-// 3. Look for detached DOM nodes, large arrays
+-```
+-
+-**Python (Memory Profiler)**
+-```python
+-from memory_profiler import profile
+-
+-@profile
+-def memory_intensive_function():
+-    large_list = [i for i in range(1000000)]
+-    return sum(large_list)
+-
+-# Run with: python -m memory_profiler script.py
+-# Shows line-by-line memory usage
+-```
+-
+-## Production Debugging
+-
+-### Application Performance Monitoring (APM)
+-
+-**New Relic**
+-```typescript
+-// newrelic.js
+-export const config = {
+-  app_name: ['My Backend API'],
+-  license_key: process.env.NEW_RELIC_LICENSE_KEY,
+-  logging: { level: 'info' },
+-  distributed_tracing: { enabled: true },
+-};
+-
+-// Import at app entry
+-import 'newrelic';
+-```
+-
+-**DataDog**
+-```typescript
+-import tracer from 'dd-trace';
+-
+-tracer.init({
+-  service: 'backend-api',
+-  env: process.env.NODE_ENV,
+-  version: '1.0.0',
+-  logInjection: true
+-});
+-```
+-
+-**Sentry (Error Tracking)**
+-```typescript
+-import * as Sentry from '@sentry/node';
+-
+-Sentry.init({
+-  dsn: process.env.SENTRY_DSN,
+-  environment: process.env.NODE_ENV,
+-  tracesSampleRate: 1.0,
+-});
+-
+-// Capture errors
+-try {
+-  await riskyOperation();
+-} catch (error) {
+-  Sentry.captureException(error, {
+-    user: { id: userId },
+-    tags: { operation: 'payment' },
+-  });
+-}
+-```
+-
+-### Distributed Tracing
+-
+-**OpenTelemetry (Vendor-Agnostic)**
+-```typescript
+-import { NodeSDK } from '@opentelemetry/sdk-node';
+-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+-
+-const sdk = new NodeSDK({
+-  traceExporter: new JaegerExporter({
+-    endpoint: 'http://localhost:14268/api/traces',
+-  }),
+-  instrumentations: [getNodeAutoInstrumentations()],
+-});
+-
+-sdk.start();
+-
+-// Traces HTTP, database, Redis automatically
+-```
+-
+-### Log Aggregation
+-
+-**ELK Stack (Elasticsearch, Logstash, Kibana)**
+-```yaml
+-# docker-compose.yml
+-version: '3'
+-services:
+-  elasticsearch:
+-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+-    environment:
+-      - discovery.type=single-node
+-    ports:
+-      - 9200:9200
+-
+-  logstash:
+-    image: docker.elastic.co/logstash/logstash:8.11.0
+-    volumes:
+-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+-
+-  kibana:
+-    image: docker.elastic.co/kibana/kibana:8.11.0
+-    ports:
+-      - 5601:5601
+-```
+-
+-**Loki + Grafana (Lightweight)**
+-```yaml
+-# promtail config for log shipping
+-server:
+-  http_listen_port: 9080
+-
+-positions:
+-  filename: /tmp/positions.yaml
+-
+-clients:
+-  - url: http://loki:3100/loki/api/v1/push
+-
+-scrape_configs:
+-  - job_name: system
+-    static_configs:
+-      - targets:
+-          - localhost
+-        labels:
+-          job: backend-api
+-          __path__: /var/log/app/*.log
+-```
+-
+-## Common Debugging Scenarios
+-
+-### 1. High CPU Usage
+-
+-**Steps:**
+-1. Profile CPU (flamegraph)
+-2. Identify hot functions
+-3. Check for:
+-   - Infinite loops
+-   - Heavy regex operations
+-   - Inefficient algorithms (O(n²))
+-   - Blocking operations in event loop (Node.js)
+-
+-**Node.js Example:**
+-```typescript
+-// ❌ Bad: Blocking event loop
+-function fibonacci(n) {
+-  if (n <= 1) return n;
+-  return fibonacci(n - 1) + fibonacci(n - 2); // Exponential time
+-}
+-
+-// ✅ Good: Memoized or iterative
+-const memo = new Map();
+-function fibonacciMemo(n) {
+-  if (n <= 1) return n;
+-  if (memo.has(n)) return memo.get(n);
+-  const result = fibonacciMemo(n - 1) + fibonacciMemo(n - 2);
+-  memo.set(n, result);
+-  return result;
+-}
+-```
+-
+-### 2. Memory Leaks
+-
+-**Symptoms:**
+-- Memory usage grows over time
+-- Eventually crashes (OOM)
+-- Performance degradation
+-
+-**Common Causes:**
+-```typescript
+-// ❌ Memory leak: Event listeners not removed
+-class DataService {
+-  constructor(eventBus) {
+-    eventBus.on('data', (data) => this.processData(data));
+-    // Listener never removed, holds reference to DataService
+-  }
+-}
+-
+-// ✅ Fix: Remove listeners
+-class DataService {
+-  constructor(eventBus) {
+-    this.eventBus = eventBus;
+-    this.handler = (data) => this.processData(data);
+-    eventBus.on('data', this.handler);
+-  }
+-
+-  destroy() {
+-    this.eventBus.off('data', this.handler);
+-  }
+-}
+-
+-// ❌ Memory leak: Global cache without limits
+-const cache = new Map();
+-function getCachedData(key) {
+-  if (!cache.has(key)) {
+-    cache.set(key, expensiveOperation(key)); // Grows forever
+-  }
+-  return cache.get(key);
+-}
+-
+-// ✅ Fix: LRU cache with size limit
+-import LRU from 'lru-cache';
+-const cache = new LRU({ max: 1000, ttl: 1000 * 60 * 60 });
+-```
+-
+-**Detection:**
+-```bash
+-# Node.js: Check heap size over time
+-node --expose-gc --max-old-space-size=4096 app.js
+-
+-# Take periodic heap snapshots
+-# Compare snapshots in Chrome DevTools
+-```
+-
+-### 3. Slow Database Queries
+-
+-**Steps:**
+-1. Enable slow query log
+-2. Analyze with EXPLAIN
+-3. Add indexes
+-4. Optimize query
+-
+-**PostgreSQL Example:**
+-```sql
+--- Before: Slow full table scan
+-SELECT * FROM orders
+-WHERE user_id = 123
+-ORDER BY created_at DESC
+-LIMIT 10;
+-
+--- EXPLAIN shows: Seq Scan on orders
+-
+--- Fix: Add index
+-CREATE INDEX idx_orders_user_id_created_at
+-ON orders(user_id, created_at DESC);
+-
+--- After: Index Scan using idx_orders_user_id_created_at
+--- 100x faster
+-```
+-
+-### 4. Connection Pool Exhaustion
+-
+-**Symptoms:**
+-- "Connection pool exhausted" errors
+-- Requests hang indefinitely
+-- Database connections at max
+-
+-**Causes & Fixes:**
+-```typescript
+-// ❌ Bad: Connection leak
+-async function getUser(id) {
+-  const client = await pool.connect();
+-  const result = await client.query('SELECT * FROM users WHERE id = $1', [id]);
+-  return result.rows[0];
+-  // Connection never released!
+-}
+-
+-// ✅ Good: Always release
+-async function getUser(id) {
+-  const client = await pool.connect();
+-  try {
+-    const result = await client.query('SELECT * FROM users WHERE id = $1', [id]);
+-    return result.rows[0];
+-  } finally {
+-    client.release(); // Always release
+-  }
+-}
+-
+-// ✅ Better: Use pool directly
+-async function getUser(id) {
+-  const result = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+-  return result.rows[0];
+-  // Automatically releases
+-}
+-```
+-
+-### 5. Race Conditions
+-
+-**Example:**
+-```typescript
+-// ❌ Bad: Race condition
+-let counter = 0;
+-
+-async function incrementCounter() {
+-  const current = counter; // Thread 1 reads 0
+-  await doSomethingAsync(); // Thread 2 reads 0
+-  counter = current + 1; // Thread 1 writes 1, Thread 2 writes 1
+-  // Expected: 2, Actual: 1
+-}
+-
+-// ✅ Fix: Atomic operations (Redis)
+-async function incrementCounter() {
+-  return await redis.incr('counter');
+-  // Atomic, thread-safe
+-}
+-
+-// ✅ Fix: Database transactions
+-async function incrementCounter(userId) {
+-  await db.transaction(async (trx) => {
+-    const user = await trx('users')
+-      .where({ id: userId })
+-      .forUpdate() // Row-level lock
+-      .first();
+-
+-    await trx('users')
+-      .where({ id: userId })
+-      .update({ counter: user.counter + 1 });
+-  });
+-}
+-```
+-
+-## Debugging Checklist
+-
+-**Before Diving Into Code:**
+-- [ ] Read error message completely
+-- [ ] Check logs for context
+-- [ ] Reproduce the issue reliably
+-- [ ] Isolate the problem (binary search)
+-- [ ] Verify assumptions
+-
+-**Investigation:**
+-- [ ] Enable debug logging
+-- [ ] Add strategic log points
+-- [ ] Use debugger breakpoints
+-- [ ] Profile performance if slow
+-- [ ] Check database queries
+-- [ ] Monitor system resources
+-
+-**Production Issues:**
+-- [ ] Check APM dashboards
+-- [ ] Review distributed traces
+-- [ ] Analyze error rates
+-- [ ] Compare with previous baseline
+-- [ ] Check for recent deployments
+-- [ ] Review infrastructure changes
+-
+-**After Fix:**
+-- [ ] Verify fix in development
+-- [ ] Add regression test
+-- [ ] Document the issue
+-- [ ] Deploy with monitoring
+-- [ ] Confirm fix in production
+-
+-## Debugging Resources
+-
+-**Tools:**
+-- Node.js: https://nodejs.org/en/docs/guides/debugging-getting-started/
+-- Chrome DevTools: https://developer.chrome.com/docs/devtools/
+-- Clinic.js: https://clinicjs.org/
+-- Sentry: https://docs.sentry.io/
+-- DataDog: https://docs.datadoghq.com/
+-- New Relic: https://docs.newrelic.com/
+-
+-**Best Practices:**
+-- 12 Factor App Logs: https://12factor.net/logs
+-- Google SRE Book: https://sre.google/sre-book/table-of-contents/
+-- OpenTelemetry: https://opentelemetry.io/docs/
+-
+-**Database:**
+-- PostgreSQL EXPLAIN: https://www.postgresql.org/docs/current/using-explain.html
+-- MongoDB Performance: https://www.mongodb.com/docs/manual/administration/analyzing-mongodb-performance/
+diff --git a/.opencode/skill/backend-development/references/backend-devops.md b/.opencode/skill/backend-development/references/backend-devops.md
+deleted file mode 100644
+index caeeb0f..0000000
+--- a/.opencode/skill/backend-development/references/backend-devops.md
++++ /dev/null
+@@ -1,494 +0,0 @@
+-# Backend DevOps Practices
+-
+-CI/CD pipelines, containerization, deployment strategies, and monitoring (2025).
+-
+-## Deployment Strategies
+-
+-### Blue-Green Deployment
+-
+-**Concept:** Two identical environments (Blue = current, Green = new)
+-
+-```
+-Production Traffic → Blue (v1.0)
+-                     Green (v2.0) ← Deploy & Test
+-
+-Switch:
+-Production Traffic → Green (v2.0)
+-                     Blue (v1.0) ← Instant rollback available
+-```
+-
+-**Pros:**
+-- Zero downtime
+-- Instant rollback
+-- Full environment testing before switch
+-
+-**Cons:**
+-- Requires double infrastructure
+-- Database migrations complex
+-
+-### Canary Deployment
+-
+-**Concept:** Gradual rollout (1% → 5% → 25% → 100%)
+-
+-```bash
+-# Kubernetes canary deployment
+-kubectl set image deployment/api api=myapp:v2
+-kubectl rollout pause deployment/api  # Pause at initial replicas
+-
+-# Monitor metrics, then continue
+-kubectl rollout resume deployment/api
+-```
+-
+-**Pros:**
+-- Risk mitigation
+-- Early issue detection
+-- Real user feedback
+-
+-**Cons:**
+-- Requires monitoring
+-- Longer deployment time
+-
+-### Feature Flags (Progressive Delivery)
+-
+-**Impact:** 90% fewer deployment failures when combined with canary
+-
+-```typescript
+-import { LaunchDarkly } from 'launchdarkly-node-server-sdk';
+-
+-const client = LaunchDarkly.init(process.env.LD_SDK_KEY);
+-
+-// Check feature flag
+-const showNewCheckout = await client.variation('new-checkout', user, false);
+-
+-if (showNewCheckout) {
+-  return newCheckoutFlow(req, res);
+-} else {
+-  return oldCheckoutFlow(req, res);
+-}
+-```
+-
+-**Use Cases:**
+-- Gradual feature rollout
+-- A/B testing
+-- Kill switch for problematic features
+-- Decouple deployment from release
+-
+-## Containerization with Docker
+-
+-### Multi-Stage Builds (Optimize Image Size)
+-
+-```dockerfile
+-# Build stage
+-FROM node:20-alpine AS builder
+-WORKDIR /app
+-COPY package*.json ./
+-RUN npm ci --only=production
+-COPY . .
+-RUN npm run build
+-
+-# Production stage
+-FROM node:20-alpine
+-WORKDIR /app
+-
+-# Copy only necessary files
+-COPY --from=builder /app/dist ./dist
+-COPY --from=builder /app/node_modules ./node_modules
+-COPY package.json ./
+-
+-# Security: Run as non-root
+-RUN addgroup -g 1001 -S nodejs && \
+-    adduser -S nodejs -u 1001
+-USER nodejs
+-
+-EXPOSE 3000
+-CMD ["node", "dist/main.js"]
+-```
+-
+-**Benefits:**
+-- Smaller image size (50-90% reduction)
+-- Faster deployments
+-- Reduced attack surface
+-
+-### Docker Compose (Local Development)
+-
+-```yaml
+-version: '3.8'
+-
+-services:
+-  api:
+-    build: .
+-    ports:
+-      - "3000:3000"
+-    environment:
+-      - DATABASE_URL=postgresql://postgres:password@db:5432/myapp
+-      - REDIS_URL=redis://redis:6379
+-    depends_on:
+-      - db
+-      - redis
+-
+-  db:
+-    image: postgres:15-alpine
+-    environment:
+-      - POSTGRES_PASSWORD=password
+-      - POSTGRES_DB=myapp
+-    volumes:
+-      - postgres-data:/var/lib/postgresql/data
+-
+-  redis:
+-    image: redis:7-alpine
+-    ports:
+-      - "6379:6379"
+-
+-volumes:
+-  postgres-data:
+-```
+-
+-## Kubernetes Orchestration
+-
+-### Deployment Manifest
+-
+-```yaml
+-apiVersion: apps/v1
+-kind: Deployment
+-metadata:
+-  name: api-deployment
+-spec:
+-  replicas: 3
+-  selector:
+-    matchLabels:
+-      app: api
+-  template:
+-    metadata:
+-      labels:
+-        app: api
+-    spec:
+-      containers:
+-      - name: api
+-        image: myregistry/api:v1.0.0
+-        ports:
+-        - containerPort: 3000
+-        env:
+-        - name: DATABASE_URL
+-          valueFrom:
+-            secretKeyRef:
+-              name: db-secret
+-              key: url
+-        resources:
+-          requests:
+-            memory: "256Mi"
+-            cpu: "250m"
+-          limits:
+-            memory: "512Mi"
+-            cpu: "500m"
+-        livenessProbe:
+-          httpGet:
+-            path: /health
+-            port: 3000
+-          initialDelaySeconds: 30
+-          periodSeconds: 10
+-        readinessProbe:
+-          httpGet:
+-            path: /ready
+-            port: 3000
+-          initialDelaySeconds: 5
+-          periodSeconds: 5
+-```
+-
+-### Horizontal Pod Autoscaling
+-
+-```yaml
+-apiVersion: autoscaling/v2
+-kind: HorizontalPodAutoscaler
+-metadata:
+-  name: api-hpa
+-spec:
+-  scaleTargetRef:
+-    apiVersion: apps/v1
+-    kind: Deployment
+-    name: api-deployment
+-  minReplicas: 3
+-  maxReplicas: 10
+-  metrics:
+-  - type: Resource
+-    resource:
+-      name: cpu
+-      target:
+-        type: Utilization
+-        averageUtilization: 70
+-```
+-
+-## CI/CD Pipelines
+-
+-### GitHub Actions (Modern, Integrated)
+-
+-```yaml
+-name: CI/CD Pipeline
+-
+-on:
+-  push:
+-    branches: [main]
+-  pull_request:
+-    branches: [main]
+-
+-jobs:
+-  test:
+-    runs-on: ubuntu-latest
+-    steps:
+-      - uses: actions/checkout@v3
+-
+-      - name: Setup Node.js
+-        uses: actions/setup-node@v3
+-        with:
+-          node-version: '20'
+-          cache: 'npm'
+-
+-      - name: Install dependencies
+-        run: npm ci
+-
+-      - name: Run linter
+-        run: npm run lint
+-
+-      - name: Run tests
+-        run: npm run test:ci
+-
+-      - name: Upload coverage
+-        uses: codecov/codecov-action@v3
+-
+-  security:
+-    runs-on: ubuntu-latest
+-    steps:
+-      - uses: actions/checkout@v3
+-
+-      - name: Run Snyk scan
+-        uses: snyk/actions/node@master
+-        env:
+-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+-
+-      - name: Container scan
+-        run: |
+-          docker build -t myapp:${{ github.sha }} .
+-          docker scan myapp:${{ github.sha }}
+-
+-  deploy:
+-    needs: [test, security]
+-    runs-on: ubuntu-latest
+-    if: github.ref == 'refs/heads/main'
+-    steps:
+-      - uses: actions/checkout@v3
+-
+-      - name: Build and push Docker image
+-        run: |
+-          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+-          docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+-
+-      - name: Deploy to Kubernetes
+-        run: |
+-          kubectl set image deployment/api api=ghcr.io/${{ github.repository }}:${{ github.sha }}
+-          kubectl rollout status deployment/api
+-```
+-
+-## Monitoring & Observability
+-
+-### Three Pillars of Observability
+-
+-**1. Metrics (Prometheus + Grafana)**
+-
+-```typescript
+-import { Counter, Histogram, register } from 'prom-client';
+-
+-// Request counter
+-const httpRequestTotal = new Counter({
+-  name: 'http_requests_total',
+-  help: 'Total HTTP requests',
+-  labelNames: ['method', 'route', 'status'],
+-});
+-
+-// Response time histogram
+-const httpRequestDuration = new Histogram({
+-  name: 'http_request_duration_seconds',
+-  help: 'HTTP request duration',
+-  labelNames: ['method', 'route'],
+-  buckets: [0.1, 0.5, 1, 2, 5],
+-});
+-
+-// Middleware to track metrics
+-app.use((req, res, next) => {
+-  const start = Date.now();
+-
+-  res.on('finish', () => {
+-    const duration = (Date.now() - start) / 1000;
+-    httpRequestTotal.inc({ method: req.method, route: req.route?.path, status: res.statusCode });
+-    httpRequestDuration.observe({ method: req.method, route: req.route?.path }, duration);
+-  });
+-
+-  next();
+-});
+-
+-// Metrics endpoint
+-app.get('/metrics', async (req, res) => {
+-  res.set('Content-Type', register.contentType);
+-  res.end(await register.metrics());
+-});
+-```
+-
+-**2. Logs (ELK Stack - Elasticsearch, Logstash, Kibana)**
+-
+-```typescript
+-import winston from 'winston';
+-import { ElasticsearchTransport } from 'winston-elasticsearch';
+-
+-const logger = winston.createLogger({
+-  level: 'info',
+-  format: winston.format.json(),
+-  transports: [
+-    new winston.transports.Console(),
+-    new ElasticsearchTransport({
+-      level: 'info',
+-      clientOpts: { node: 'http://localhost:9200' },
+-      index: 'logs',
+-    }),
+-  ],
+-});
+-
+-// Structured logging
+-logger.info('User created', {
+-  userId: user.id,
+-  email: user.email,
+-  ipAddress: req.ip,
+-  userAgent: req.headers['user-agent'],
+-});
+-```
+-
+-**3. Traces (Jaeger/OpenTelemetry)**
+-
+-```typescript
+-import { NodeSDK } from '@opentelemetry/sdk-node';
+-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+-
+-const sdk = new NodeSDK({
+-  traceExporter: new JaegerExporter({
+-    endpoint: 'http://localhost:14268/api/traces',
+-  }),
+-  serviceName: 'api-service',
+-});
+-
+-sdk.start();
+-
+-// Traces automatically captured for HTTP requests, database queries, etc.
+-```
+-
+-### Health Checks
+-
+-```typescript
+-// Liveness probe - Is the app running?
+-app.get('/health/liveness', (req, res) => {
+-  res.status(200).json({ status: 'ok', timestamp: Date.now() });
+-});
+-
+-// Readiness probe - Is the app ready to serve traffic?
+-app.get('/health/readiness', async (req, res) => {
+-  const checks = {
+-    database: await checkDatabase(),
+-    redis: await checkRedis(),
+-    externalAPI: await checkExternalAPI(),
+-  };
+-
+-  const isReady = Object.values(checks).every(Boolean);
+-  res.status(isReady ? 200 : 503).json({
+-    status: isReady ? 'ready' : 'not ready',
+-    checks,
+-  });
+-});
+-
+-async function checkDatabase() {
+-  try {
+-    await db.query('SELECT 1');
+-    return true;
+-  } catch {
+-    return false;
+-  }
+-}
+-```
+-
+-## Secrets Management
+-
+-### HashiCorp Vault
+-
+-```bash
+-# Store secret
+-vault kv put secret/myapp/db password=super-secret
+-
+-# Retrieve secret
+-vault kv get -field=password secret/myapp/db
+-```
+-
+-### Kubernetes Secrets
+-
+-```yaml
+-apiVersion: v1
+-kind: Secret
+-metadata:
+-  name: db-secret
+-type: Opaque
+-stringData:
+-  url: postgresql://user:pass@host:5432/db
+----
+-# Reference in deployment
+-env:
+-- name: DATABASE_URL
+-  valueFrom:
+-    secretKeyRef:
+-      name: db-secret
+-      key: url
+-```
+-
+-## Infrastructure as Code (Terraform)
+-
+-```hcl
+-# main.tf
+-resource "aws_db_instance" "main" {
+-  identifier        = "myapp-db"
+-  engine            = "postgres"
+-  engine_version    = "15.3"
+-  instance_class    = "db.t3.micro"
+-  allocated_storage = 20
+-  username          = "admin"
+-  password          = var.db_password
+-
+-  backup_retention_period = 7
+-  skip_final_snapshot     = false
+-}
+-
+-resource "aws_elasticache_cluster" "redis" {
+-  cluster_id           = "myapp-redis"
+-  engine               = "redis"
+-  node_type            = "cache.t3.micro"
+-  num_cache_nodes      = 1
+-  parameter_group_name = "default.redis7"
+-}
+-```
+-
+-## DevOps Checklist
+-
+-- [ ] CI/CD pipeline configured (GitHub Actions/GitLab CI/Jenkins)
+-- [ ] Docker multi-stage builds implemented
+-- [ ] Kubernetes deployment manifests created
+-- [ ] Blue-green or canary deployment strategy
+-- [ ] Feature flags configured (LaunchDarkly/Unleash)
+-- [ ] Health checks (liveness + readiness probes)
+-- [ ] Monitoring: Prometheus + Grafana
+-- [ ] Logging: ELK Stack or similar
+-- [ ] Distributed tracing: Jaeger/OpenTelemetry
+-- [ ] Secrets management (Vault/AWS Secrets Manager)
+-- [ ] Infrastructure as Code (Terraform/CloudFormation)
+-- [ ] Autoscaling configured
+-- [ ] Backup and disaster recovery plan
+-
+-## Resources
+-
+-- **Kubernetes:** https://kubernetes.io/docs/
+-- **Docker:** https://docs.docker.com/
+-- **Prometheus:** https://prometheus.io/docs/
+-- **OpenTelemetry:** https://opentelemetry.io/docs/
+-- **Terraform:** https://www.terraform.io/docs/
+diff --git a/.opencode/skill/backend-development/references/backend-mindset.md b/.opencode/skill/backend-development/references/backend-mindset.md
+deleted file mode 100644
+index 79795a6..0000000
+--- a/.opencode/skill/backend-development/references/backend-mindset.md
++++ /dev/null
+@@ -1,387 +0,0 @@
+-# Backend Development Mindset
+-
+-Problem-solving approaches, architectural thinking, and collaboration patterns for backend engineers (2025).
+-
+-## Problem-Solving Mindset
+-
+-### Systems Thinking Approach
+-
+-**Holistic Engineering** - Understanding how components interact within larger ecosystem
+-
+-```
+-User Request
+-  → Load Balancer
+-  → API Gateway (auth, rate limiting)
+-  → Application (business logic)
+-  → Cache Layer (Redis)
+-  → Database (persistent storage)
+-  → Message Queue (async processing)
+-  → External Services
+-```
+-
+-**Questions to Ask:**
+-- What happens if this component fails?
+-- How does this scale under load?
+-- What are the dependencies?
+-- Where are the bottlenecks?
+-- What's the blast radius of changes?
+-
+-### Breaking Down Complex Problems
+-
+-**Decomposition Strategy:**
+-
+-1. **Understand requirements** - What problem are we solving?
+-2. **Identify constraints** - Performance, budget, timeline, tech stack
+-3. **Break into modules** - Separate concerns (auth, data, business logic)
+-4. **Define interfaces** - API contracts between modules
+-5. **Prioritize** - Critical path first
+-6. **Iterate** - Build, test, refine
+-
+-**Example: Building Payment System**
+-
+-```
+-Complex: "Build payment processing"
+-
+-Decomposed:
+-1. Payment gateway integration (Stripe/PayPal)
+-2. Order creation and validation
+-3. Payment intent creation
+-4. Webhook handling (success/failure)
+-5. Idempotency (prevent double charges)
+-6. Retry logic for transient failures
+-7. Audit logging
+-8. Refund processing
+-9. Reconciliation system
+-```
+-
+-## Trade-Off Analysis
+-
+-### CAP Theorem (Choose 2 of 3)
+-
+-**Consistency** - All nodes see same data at same time
+-**Availability** - Every request receives response
+-**Partition Tolerance** - System works despite network failures
+-
+-**Real-World Choices:**
+-- **CP (Consistency + Partition Tolerance):** Banking systems, financial transactions
+-- **AP (Availability + Partition Tolerance):** Social media feeds, product catalogs
+-- **CA (Consistency + Availability):** Single-node databases (not distributed)
+-
+-### PACELC Extension
+-
+-**If Partition:** Choose Availability or Consistency
+-**Else (no partition):** Choose Latency or Consistency
+-
+-**Examples:**
+-- **PA/EL:** Cassandra (available during partition, low latency normally)
+-- **PC/EC:** HBase (consistent during partition, consistent over latency)
+-- **PA/EC:** DynamoDB (configurable consistency vs latency)
+-
+-### Performance vs Maintainability
+-
+-| Optimize For | When to Choose |
+-|--------------|---------------|
+-| **Performance** | Hot paths, high-traffic endpoints, real-time systems |
+-| **Maintainability** | Internal tools, admin dashboards, CRUD operations |
+-| **Both** | Core business logic, payment processing, authentication |
+-
+-**Example:**
+-```typescript
+-// Maintainable: Readable, easy to debug
+-const users = await db.users.findAll({
+-  where: { active: true },
+-  include: ['posts', 'comments'],
+-});
+-
+-// Performant: Optimized query, reduced joins
+-const users = await db.query(`
+-  SELECT u.*,
+-    (SELECT COUNT(*) FROM posts WHERE user_id = u.id) as post_count,
+-    (SELECT COUNT(*) FROM comments WHERE user_id = u.id) as comment_count
+-  FROM users u
+-  WHERE u.active = true
+-`);
+-```
+-
+-### Technical Debt Management
+-
+-**20-40% productivity increase** from addressing technical debt properly
+-
+-**Debt Quadrants:**
+-1. **Reckless + Deliberate:** "We don't have time for design"
+-2. **Reckless + Inadvertent:** "What's layering?"
+-3. **Prudent + Deliberate:** "Ship now, refactor later" (acceptable)
+-4. **Prudent + Inadvertent:** "Now we know better" (acceptable)
+-
+-**Prioritization:**
+-- High interest, high impact → Fix immediately
+-- High interest, low impact → Schedule in sprint
+-- Low interest, high impact → Tech debt backlog
+-- Low interest, low impact → Leave as-is
+-
+-## Architectural Thinking
+-
+-### Domain-Driven Design (DDD)
+-
+-**Bounded Contexts** - Separate models for different domains
+-
+-```
+-E-commerce System:
+-
+-[Sales Context]          [Inventory Context]       [Shipping Context]
+-- Order (id, items,      - Product (id, stock,     - Shipment (id,
+-  total, customer)        location, reserved)       address, status)
+-- Customer (id, email)   - Warehouse (id, name)    - Carrier (name, API)
+-- Payment (status)       - StockLevel (quantity)   - Tracking (number)
+-
+-Each context has its own:
+-- Data model
+-- Business rules
+-- Database schema
+-- API contracts
+-```
+-
+-**Ubiquitous Language** - Shared vocabulary between devs and domain experts
+-
+-### Layered Architecture (Separation of Concerns)
+-
+-```
+-┌─────────────────────────────┐
+-│   Presentation Layer        │  Controllers, Routes, DTOs
+-│   (API endpoints)           │
+-├─────────────────────────────┤
+-│   Business Logic Layer      │  Services, Use Cases, Domain Logic
+-│   (Core logic)              │
+-├─────────────────────────────┤
+-│   Data Access Layer         │  Repositories, ORMs, Database
+-│   (Persistence)             │
+-└─────────────────────────────┘
+-```
+-
+-**Benefits:**
+-- Clear responsibilities
+-- Easier testing (mock layers)
+-- Flexibility to change implementations
+-- Reduced coupling
+-
+-### Designing for Failure (Resilience)
+-
+-**Assume everything fails eventually**
+-
+-**Patterns:**
+-1. **Circuit Breaker** - Stop calling failing service
+-2. **Retry with Backoff** - Exponential delay between retries
+-3. **Timeout** - Don't wait forever
+-4. **Fallback** - Graceful degradation
+-5. **Bulkhead** - Isolate failures (resource pools)
+-
+-```typescript
+-import { CircuitBreaker } from 'opossum';
+-
+-const breaker = new CircuitBreaker(externalAPICall, {
+-  timeout: 3000, // 3s timeout
+-  errorThresholdPercentage: 50, // Open after 50% failures
+-  resetTimeout: 30000, // Try again after 30s
+-});
+-
+-breaker.fallback(() => ({ data: 'cached-response' }));
+-
+-const result = await breaker.fire(requestParams);
+-```
+-
+-## Developer Mindset
+-
+-### Writing Maintainable Code
+-
+-**SOLID Principles:**
+-
+-**S - Single Responsibility** - Class/function does one thing
+-```typescript
+-// Bad: User class handles auth + email + logging
+-class User {
+-  authenticate() {}
+-  sendEmail() {}
+-  logActivity() {}
+-}
+-
+-// Good: Separate responsibilities
+-class User {
+-  authenticate() {}
+-}
+-class EmailService {
+-  sendEmail() {}
+-}
+-class Logger {
+-  logActivity() {}
+-}
+-```
+-
+-**O - Open/Closed** - Open for extension, closed for modification
+-```typescript
+-// Good: Strategy pattern
+-interface PaymentStrategy {
+-  process(amount: number): Promise<PaymentResult>;
+-}
+-
+-class StripePayment implements PaymentStrategy {
+-  async process(amount: number) { /* ... */ }
+-}
+-
+-class PayPalPayment implements PaymentStrategy {
+-  async process(amount: number) { /* ... */ }
+-}
+-```
+-
+-### Thinking About Edge Cases
+-
+-**Common Edge Cases:**
+-- Empty arrays/collections
+-- Null/undefined values
+-- Boundary values (min/max integers)
+-- Concurrent requests (race conditions)
+-- Network failures
+-- Duplicate requests (idempotency)
+-- Invalid input (SQL injection, XSS)
+-
+-```typescript
+-// Good: Handle edge cases explicitly
+-async function getUsers(limit?: number) {
+-  // Validate input
+-  if (limit !== undefined && (limit < 1 || limit > 1000)) {
+-    throw new Error('Limit must be between 1 and 1000');
+-  }
+-
+-  // Handle undefined
+-  const safeLimit = limit ?? 50;
+-
+-  // Prevent SQL injection with parameterized query
+-  const users = await db.query('SELECT * FROM users LIMIT $1', [safeLimit]);
+-
+-  // Handle empty results
+-  return users.length > 0 ? users : [];
+-}
+-```
+-
+-### Testing Mindset (TDD/BDD)
+-
+-**70% happy-path tests drafted by AI, humans focus on edge cases**
+-
+-**Test-Driven Development (TDD):**
+-```
+-1. Write failing test
+-2. Write minimal code to pass
+-3. Refactor
+-4. Repeat
+-```
+-
+-**Behavior-Driven Development (BDD):**
+-```gherkin
+-Feature: User Registration
+-  Scenario: User registers with valid email
+-    Given I am on the registration page
+-    When I enter "test@example.com" as email
+-    And I enter "SecurePass123!" as password
+-    Then I should see "Registration successful"
+-    And I should receive a welcome email
+-```
+-
+-### Observability and Debugging Approach
+-
+-**100% median ROI, $500k average return** from observability investments
+-
+-**Three Questions:**
+-1. **Is it slow?** → Check metrics (response time, DB queries)
+-2. **Is it broken?** → Check logs (errors, stack traces)
+-3. **Where is it broken?** → Check traces (distributed systems)
+-
+-```typescript
+-// Good: Structured logging with context
+-logger.error('Payment processing failed', {
+-  orderId: order.id,
+-  userId: user.id,
+-  amount: order.total,
+-  error: error.message,
+-  stack: error.stack,
+-  timestamp: Date.now(),
+-  ipAddress: req.ip,
+-});
+-```
+-
+-## Collaboration & Communication
+-
+-### API Contract Design (Treating APIs as Products)
+-
+-**Principles:**
+-1. **Versioning** - `/api/v1/users`, `/api/v2/users`
+-2. **Consistency** - Same patterns across endpoints
+-3. **Documentation** - OpenAPI/Swagger
+-4. **Backward compatibility** - Don't break existing clients
+-5. **Clear error messages** - Help clients fix issues
+-
+-```typescript
+-// Good: Consistent API design
+-GET    /api/v1/users         # List users
+-GET    /api/v1/users/:id     # Get user
+-POST   /api/v1/users         # Create user
+-PUT    /api/v1/users/:id     # Update user
+-DELETE /api/v1/users/:id     # Delete user
+-
+-// Consistent error format
+-{
+-  "error": {
+-    "code": "VALIDATION_ERROR",
+-    "message": "Invalid email format",
+-    "field": "email",
+-    "timestamp": "2025-01-09T12:00:00Z"
+-  }
+-}
+-```
+-
+-### Database Schema Design Discussions
+-
+-**Key Considerations:**
+-- **Normalization vs Denormalization** - Trade-offs for performance
+-- **Indexing strategy** - Query patterns dictate indexes
+-- **Migration path** - How to evolve schema without downtime
+-- **Data types** - VARCHAR(255) vs TEXT, INT vs BIGINT
+-- **Constraints** - Foreign keys, unique constraints, check constraints
+-
+-### Code Review Mindset (Prevention-First)
+-
+-**What to Look For:**
+-- Security vulnerabilities (SQL injection, XSS)
+-- Performance issues (N+1 queries, missing indexes)
+-- Error handling (uncaught exceptions)
+-- Edge cases (null checks, boundary values)
+-- Readability (naming, comments for complex logic)
+-- Tests (coverage for new code)
+-
+-**Constructive Feedback:**
+-```
+-# Good review comment
+-"This could be vulnerable to SQL injection. Consider using parameterized queries:
+-`db.query('SELECT * FROM users WHERE id = $1', [userId])`"
+-
+-# Bad review comment
+-"This is wrong. Fix it."
+-```
+-
+-## Mindset Checklist
+-
+-- [ ] Think in systems (understand dependencies)
+-- [ ] Analyze trade-offs (CAP, performance vs maintainability)
+-- [ ] Design for failure (circuit breakers, retries)
+-- [ ] Apply SOLID principles
+-- [ ] Consider edge cases (null, empty, boundaries)
+-- [ ] Write tests first (TDD/BDD)
+-- [ ] Log with context (structured logging)
+-- [ ] Design APIs as products (versioning, docs)
+-- [ ] Plan database schema evolution
+-- [ ] Give constructive code reviews
+-
+-## Resources
+-
+-- **Domain-Driven Design:** https://martinfowler.com/bliki/DomainDrivenDesign.html
+-- **CAP Theorem:** https://en.wikipedia.org/wiki/CAP_theorem
+-- **SOLID Principles:** https://en.wikipedia.org/wiki/SOLID
+-- **Resilience Patterns:** https://docs.microsoft.com/en-us/azure/architecture/patterns/
+diff --git a/.opencode/skill/backend-development/references/backend-performance.md b/.opencode/skill/backend-development/references/backend-performance.md
+deleted file mode 100644
+index e8b4931..0000000
+--- a/.opencode/skill/backend-development/references/backend-performance.md
++++ /dev/null
+@@ -1,397 +0,0 @@
+-# Backend Performance & Scalability
+-
+-Performance optimization strategies, caching patterns, and scalability best practices (2025).
+-
+-## Database Performance
+-
+-### Query Optimization
+-
+-#### Indexing Strategies
+-
+-**Impact:** 30% disk I/O reduction, 10-100x query speedup
+-
+-```sql
+--- Create index on frequently queried columns
+-CREATE INDEX idx_users_email ON users(email);
+-CREATE INDEX idx_orders_user_id ON orders(user_id);
+-
+--- Composite index for multi-column queries
+-CREATE INDEX idx_orders_user_date ON orders(user_id, created_at DESC);
+-
+--- Partial index for filtered queries
+-CREATE INDEX idx_active_users ON users(email) WHERE active = true;
+-
+--- Analyze query performance
+-EXPLAIN ANALYZE SELECT * FROM orders
+-WHERE user_id = 123 AND created_at > '2025-01-01';
+-```
+-
+-**Index Types:**
+-- **B-tree** - Default, general-purpose (equality, range queries)
+-- **Hash** - Fast equality lookups, no range queries
+-- **GIN** - Full-text search, JSONB queries
+-- **GiST** - Geospatial queries, range types
+-
+-**When NOT to Index:**
+-- Small tables (<1000 rows)
+-- Frequently updated columns
+-- Low-cardinality columns (e.g., boolean with 2 values)
+-
+-### Connection Pooling
+-
+-**Impact:** 5-10x performance improvement
+-
+-```typescript
+-// PostgreSQL with pg-pool
+-import { Pool } from 'pg';
+-
+-const pool = new Pool({
+-  host: process.env.DB_HOST,
+-  database: process.env.DB_NAME,
+-  user: process.env.DB_USER,
+-  password: process.env.DB_PASSWORD,
+-  max: 20, // Maximum connections
+-  min: 5, // Minimum connections
+-  idleTimeoutMillis: 30000, // Close idle connections after 30s
+-  connectionTimeoutMillis: 2000, // Error if can't connect in 2s
+-});
+-
+-// Use pool for queries
+-const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+-```
+-
+-**Recommended Pool Sizes:**
+-- **Web servers:** `connections = (core_count * 2) + effective_spindle_count`
+-- **Typical:** 20-30 connections per app instance
+-- **Monitor:** Connection saturation in production
+-
+-### N+1 Query Problem
+-
+-**Bad: N+1 queries**
+-```typescript
+-// Fetches 1 query for posts, then N queries for authors
+-const posts = await Post.findAll();
+-for (const post of posts) {
+-  post.author = await User.findById(post.authorId); // N queries!
+-}
+-```
+-
+-**Good: Join or eager loading**
+-```typescript
+-// Single query with JOIN
+-const posts = await Post.findAll({
+-  include: [{ model: User, as: 'author' }],
+-});
+-```
+-
+-## Caching Strategies
+-
+-### Redis Caching
+-
+-**Impact:** 90% DB load reduction, 10-100x faster response
+-
+-#### Cache-Aside Pattern (Lazy Loading)
+-
+-```typescript
+-async function getUser(userId: string) {
+-  // Try cache first
+-  const cached = await redis.get(`user:${userId}`);
+-  if (cached) return JSON.parse(cached);
+-
+-  // Cache miss - fetch from DB
+-  const user = await db.users.findById(userId);
+-
+-  // Store in cache (TTL: 1 hour)
+-  await redis.setex(`user:${userId}`, 3600, JSON.stringify(user));
+-
+-  return user;
+-}
+-```
+-
+-#### Write-Through Pattern
+-
+-```typescript
+-async function updateUser(userId: string, data: UpdateUserDto) {
+-  // Update database
+-  const user = await db.users.update(userId, data);
+-
+-  // Update cache immediately
+-  await redis.setex(`user:${userId}`, 3600, JSON.stringify(user));
+-
+-  return user;
+-}
+-```
+-
+-#### Cache Invalidation
+-
+-```typescript
+-// Invalidate on update
+-async function deleteUser(userId: string) {
+-  await db.users.delete(userId);
+-  await redis.del(`user:${userId}`);
+-  await redis.del(`user:${userId}:posts`); // Invalidate related caches
+-}
+-
+-// Pattern-based invalidation
+-await redis.keys('user:*').then(keys => redis.del(...keys));
+-```
+-
+-### Cache Layers
+-
+-```
+-Client
+-  → CDN Cache (static assets, 50%+ latency reduction)
+-  → API Gateway Cache (public endpoints)
+-  → Application Cache (Redis)
+-  → Database Query Cache
+-  → Database
+-```
+-
+-### Cache Best Practices
+-
+-1. **Cache frequently accessed data** - User profiles, config, product catalogs
+-2. **Set appropriate TTL** - Balance freshness vs performance
+-3. **Invalidate on write** - Keep cache consistent
+-4. **Use cache keys wisely** - `resource:id:attribute` pattern
+-5. **Monitor hit rates** - Target >80% hit rate
+-
+-## Load Balancing
+-
+-### Algorithms
+-
+-**Round Robin** - Distribute evenly across servers
+-```nginx
+-upstream backend {
+-    server backend1.example.com;
+-    server backend2.example.com;
+-    server backend3.example.com;
+-}
+-```
+-
+-**Least Connections** - Route to server with fewest connections
+-```nginx
+-upstream backend {
+-    least_conn;
+-    server backend1.example.com;
+-    server backend2.example.com;
+-}
+-```
+-
+-**IP Hash** - Same client → same server (session affinity)
+-```nginx
+-upstream backend {
+-    ip_hash;
+-    server backend1.example.com;
+-    server backend2.example.com;
+-}
+-```
+-
+-### Health Checks
+-
+-```typescript
+-// Express health check endpoint
+-app.get('/health', async (req, res) => {
+-  const checks = {
+-    uptime: process.uptime(),
+-    timestamp: Date.now(),
+-    database: await checkDatabase(),
+-    redis: await checkRedis(),
+-    memory: process.memoryUsage(),
+-  };
+-
+-  const isHealthy = checks.database && checks.redis;
+-  res.status(isHealthy ? 200 : 503).json(checks);
+-});
+-```
+-
+-## Asynchronous Processing
+-
+-### Message Queues for Long-Running Tasks
+-
+-```typescript
+-// Producer - Add job to queue
+-import Queue from 'bull';
+-
+-const emailQueue = new Queue('email', {
+-  redis: { host: 'localhost', port: 6379 },
+-});
+-
+-await emailQueue.add('send-welcome', {
+-  userId: user.id,
+-  email: user.email,
+-});
+-
+-// Consumer - Process jobs
+-emailQueue.process('send-welcome', async (job) => {
+-  await sendWelcomeEmail(job.data.email);
+-});
+-```
+-
+-**Use Cases:**
+-- Email sending
+-- Image/video processing
+-- Report generation
+-- Data export
+-- Webhook delivery
+-
+-## CDN (Content Delivery Network)
+-
+-**Impact:** 50%+ latency reduction for global users
+-
+-### Configuration
+-
+-```typescript
+-// Cache-Control headers
+-res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'); // Static assets
+-res.setHeader('Cache-Control', 'public, max-age=3600'); // API responses
+-res.setHeader('Cache-Control', 'private, no-cache'); // User-specific data
+-```
+-
+-**CDN Providers:**
+-- Cloudflare (generous free tier, global coverage)
+-- AWS CloudFront (AWS integration)
+-- Fastly (real-time purging)
+-
+-## Horizontal vs Vertical Scaling
+-
+-### Horizontal Scaling (Scale Out)
+-
+-**Pros:**
+-- Better fault tolerance
+-- Unlimited scaling potential
+-- Cost-effective (commodity hardware)
+-
+-**Cons:**
+-- Complex architecture
+-- Data consistency challenges
+-- Network overhead
+-
+-**When to use:** High traffic, need redundancy, stateless applications
+-
+-### Vertical Scaling (Scale Up)
+-
+-**Pros:**
+-- Simple architecture
+-- No code changes needed
+-- Easier data consistency
+-
+-**Cons:**
+-- Hardware limits
+-- Single point of failure
+-- Expensive at high end
+-
+-**When to use:** Monolithic apps, rapid scaling needed, data consistency critical
+-
+-## Database Scaling Patterns
+-
+-### Read Replicas
+-
+-```
+-Primary (Write) → Replica 1 (Read)
+-               → Replica 2 (Read)
+-               → Replica 3 (Read)
+-```
+-
+-**Implementation:**
+-```typescript
+-// Write to primary
+-await primaryDb.users.create(userData);
+-
+-// Read from replica
+-const users = await replicaDb.users.findAll();
+-```
+-
+-**Use Cases:**
+-- Read-heavy workloads (90%+ reads)
+-- Analytics queries
+-- Reporting dashboards
+-
+-### Database Sharding
+-
+-**Horizontal Partitioning** - Split data across databases
+-
+-```typescript
+-// Shard by user ID
+-function getShardId(userId: string): number {
+-  return hashCode(userId) % SHARD_COUNT;
+-}
+-
+-const shardId = getShardId(userId);
+-const db = shards[shardId];
+-const user = await db.users.findById(userId);
+-```
+-
+-**Sharding Strategies:**
+-- **Range-based:** Users 1-1M → Shard 1, 1M-2M → Shard 2
+-- **Hash-based:** Hash(userId) % shard_count
+-- **Geographic:** EU users → EU shard, US users → US shard
+-- **Entity-based:** Users → Shard 1, Orders → Shard 2
+-
+-## Performance Monitoring
+-
+-### Key Metrics
+-
+-**Application:**
+-- Response time (p50, p95, p99)
+-- Throughput (requests/second)
+-- Error rate
+-- CPU/memory usage
+-
+-**Database:**
+-- Query execution time
+-- Connection pool saturation
+-- Cache hit rate
+-- Slow query log
+-
+-**Tools:**
+-- Prometheus + Grafana (metrics)
+-- New Relic / Datadog (APM)
+-- Sentry (error tracking)
+-- OpenTelemetry (distributed tracing)
+-
+-## Performance Optimization Checklist
+-
+-### Database
+-- [ ] Indexes on frequently queried columns
+-- [ ] Connection pooling configured
+-- [ ] N+1 queries eliminated
+-- [ ] Slow query log monitored
+-- [ ] Query execution plans analyzed
+-
+-### Caching
+-- [ ] Redis cache for hot data
+-- [ ] Cache TTL configured appropriately
+-- [ ] Cache invalidation on writes
+-- [ ] CDN for static assets
+-- [ ] >80% cache hit rate achieved
+-
+-### Application
+-- [ ] Async processing for long tasks
+-- [ ] Response compression enabled (gzip)
+-- [ ] Load balancing configured
+-- [ ] Health checks implemented
+-- [ ] Resource limits set (CPU, memory)
+-
+-### Monitoring
+-- [ ] APM tool configured (New Relic/Datadog)
+-- [ ] Error tracking (Sentry)
+-- [ ] Performance dashboards (Grafana)
+-- [ ] Alerting on key metrics
+-- [ ] Distributed tracing for microservices
+-
+-## Common Performance Pitfalls
+-
+-1. **No caching** - Repeatedly querying same data
+-2. **Missing indexes** - Full table scans
+-3. **N+1 queries** - Fetching related data in loops
+-4. **Synchronous processing** - Blocking on long tasks
+-5. **No connection pooling** - Creating new connections per request
+-6. **Unbounded queries** - No LIMIT on large tables
+-7. **No CDN** - Serving static assets from origin
+-
+-## Resources
+-
+-- **PostgreSQL Performance:** https://www.postgresql.org/docs/current/performance-tips.html
+-- **Redis Best Practices:** https://redis.io/docs/management/optimization/
+-- **Web Performance:** https://web.dev/performance/
+-- **Database Indexing:** https://use-the-index-luke.com/
+diff --git a/.opencode/skill/backend-development/references/backend-security.md b/.opencode/skill/backend-development/references/backend-security.md
+deleted file mode 100644
+index 3f99643..0000000
+--- a/.opencode/skill/backend-development/references/backend-security.md
++++ /dev/null
+@@ -1,290 +0,0 @@
+-# Backend Security
+-
+-Security best practices, OWASP Top 10 mitigation, and modern security standards (2025).
+-
+-## OWASP Top 10 (2025 RC1)
+-
+-### New Entries (2025)
+-- **Supply Chain Failures** - Vulnerable dependencies, compromised packages
+-- **Mishandling of Exceptional Conditions** - Improper error handling exposing system info
+-
+-### Top Vulnerabilities & Mitigation
+-
+-#### 1. Broken Access Control
+-**Risk:** Users access unauthorized resources (28% of vulnerabilities)
+-
+-**Mitigation:**
+-- Implement RBAC (Role-Based Access Control)
+-- Deny by default, explicitly allow
+-- Log access control failures
+-- Enforce authorization on backend (never client-side)
+-- Use JWT with proper claims validation
+-
+-```typescript
+-// Good: Server-side authorization check
+-@UseGuards(JwtAuthGuard, RolesGuard)
+-@Roles('admin')
+-async deleteUser(@Param('id') id: string) {
+-  // Verify user can access this resource
+-  return this.usersService.delete(id);
+-}
+-```
+-
+-#### 2. Cryptographic Failures
+-**Risk:** Sensitive data exposure, weak encryption
+-
+-**Mitigation:**
+-- Use Argon2id for password hashing (replaces bcrypt as of 2025)
+-- TLS 1.3 for data in transit
+-- Encrypt sensitive data at rest (AES-256)
+-- Use crypto.randomBytes() for tokens, not Math.random()
+-- Never store passwords in plain text
+-
+-```python
+-# Good: Argon2id password hashing
+-from argon2 import PasswordHasher
+-
+-ph = PasswordHasher()
+-hash = ph.hash("password123")  # Auto-salted, memory-hard
+-ph.verify(hash, "password123")  # Verify password
+-```
+-
+-#### 3. Injection Attacks
+-**Risk:** SQL injection, NoSQL injection, command injection (6x increase 2020-2024)
+-
+-**Mitigation (98% vulnerability reduction):**
+-- Use parameterized queries ALWAYS
+-- Input validation with allow-lists
+-- Escape special characters
+-- Use ORMs properly (avoid raw queries)
+-
+-```typescript
+-// Bad: Vulnerable to SQL injection
+-const query = `SELECT * FROM users WHERE email = '${email}'`;
+-
+-// Good: Parameterized query
+-const query = 'SELECT * FROM users WHERE email = $1';
+-const result = await db.query(query, [email]);
+-```
+-
+-#### 4. Insecure Design
+-**Risk:** Flawed architecture, missing security controls
+-
+-**Mitigation:**
+-- Threat modeling during design phase
+-- Security requirements from start
+-- Principle of least privilege
+-- Defense in depth (multiple security layers)
+-
+-#### 5. Security Misconfiguration
+-**Risk:** Default credentials, verbose errors, unnecessary features enabled
+-
+-**Mitigation:**
+-- Remove default accounts
+-- Disable directory listing
+-- Use security headers (CSP, HSTS, X-Frame-Options)
+-- Minimize attack surface
+-- Regular security audits
+-
+-```typescript
+-// Security headers middleware
+-app.use(helmet({
+-  contentSecurityPolicy: {
+-    directives: {
+-      defaultSrc: ["'self'"],
+-      scriptSrc: ["'self'", "'unsafe-inline'"],
+-    },
+-  },
+-  hsts: {
+-    maxAge: 31536000,
+-    includeSubDomains: true,
+-  },
+-}));
+-```
+-
+-#### 6. Vulnerable Components
+-**Risk:** Outdated dependencies with known vulnerabilities
+-
+-**Mitigation:**
+-- Regular dependency updates (npm audit, pip-audit)
+-- Use Dependabot/Renovate for automated updates
+-- Monitor CVE databases
+-- Software composition analysis (SCA) in CI/CD
+-- Lock file integrity checks
+-
+-```bash
+-# Check for vulnerabilities
+-npm audit fix
+-pip-audit --fix
+-```
+-
+-#### 7. Authentication Failures
+-**Risk:** Weak passwords, session hijacking, credential stuffing
+-
+-**Mitigation:**
+-- MFA mandatory for admin accounts
+-- Rate limiting on login endpoints (10 attempts/minute)
+-- Strong password policies (12+ chars, complexity)
+-- Session timeout (15 mins idle, 8 hours absolute)
+-- FIDO2/WebAuthn for passwordless auth
+-
+-#### 8. Software & Data Integrity Failures
+-**Risk:** CI/CD pipeline compromise, unsigned updates
+-
+-**Mitigation:**
+-- Code signing for releases
+-- Verify integrity of packages (lock files)
+-- Secure CI/CD pipelines (immutable builds)
+-- Checksum verification
+-
+-#### 9. Logging & Monitoring Failures
+-**Risk:** Breaches undetected, insufficient audit trail
+-
+-**Mitigation:**
+-- Log authentication events (success/failure)
+-- Log access control failures
+-- Centralized logging (ELK Stack, Splunk)
+-- Alerting on suspicious patterns
+-- Log rotation and retention policies
+-
+-#### 10. Server-Side Request Forgery (SSRF)
+-**Risk:** Server makes malicious requests to internal resources
+-
+-**Mitigation:**
+-- Validate and sanitize URLs
+-- Allow-list for remote resources
+-- Network segmentation
+-- Disable unnecessary protocols (file://, gopher://)
+-
+-## Input Validation (Prevents 70%+ Vulnerabilities)
+-
+-### Validation Strategies
+-
+-**1. Type Validation**
+-```typescript
+-// Use class-validator with NestJS
+-class CreateUserDto {
+-  @IsEmail()
+-  email: string;
+-
+-  @IsString()
+-  @MinLength(12)
+-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+-  password: string;
+-
+-  @IsInt()
+-  @Min(18)
+-  age: number;
+-}
+-```
+-
+-**2. Sanitization**
+-```typescript
+-import DOMPurify from 'isomorphic-dompurify';
+-
+-// Sanitize HTML input
+-const clean = DOMPurify.sanitize(userInput);
+-```
+-
+-**3. Allow-lists (Preferred over Deny-lists)**
+-```typescript
+-// Good: Allow-list approach
+-const allowedFields = ['name', 'email', 'age'];
+-const sanitized = Object.keys(input)
+-  .filter(key => allowedFields.includes(key))
+-  .reduce((obj, key) => ({ ...obj, [key]: input[key] }), {});
+-```
+-
+-## Rate Limiting
+-
+-### Token Bucket Algorithm (Industry Standard)
+-
+-```typescript
+-import rateLimit from 'express-rate-limit';
+-
+-const limiter = rateLimit({
+-  windowMs: 15 * 60 * 1000, // 15 minutes
+-  max: 100, // 100 requests per window
+-  standardHeaders: true,
+-  legacyHeaders: false,
+-  message: 'Too many requests, please try again later',
+-});
+-
+-app.use('/api/', limiter);
+-```
+-
+-### API-Specific Limits
+-
+-- **Authentication:** 10 attempts/15 min
+-- **Public APIs:** 100 requests/15 min
+-- **Authenticated APIs:** 1000 requests/15 min
+-- **Admin endpoints:** 50 requests/15 min
+-
+-## Security Headers
+-
+-```typescript
+-// Essential security headers (2025)
+-{
+-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+-  'Content-Security-Policy': "default-src 'self'",
+-  'X-Frame-Options': 'DENY',
+-  'X-Content-Type-Options': 'nosniff',
+-  'Referrer-Policy': 'strict-origin-when-cross-origin',
+-  'Permissions-Policy': 'geolocation=(), microphone=()',
+-}
+-```
+-
+-## Secrets Management
+-
+-### Best Practices
+-
+-1. **Never commit secrets** - Use .env files (gitignored)
+-2. **Environment-specific** - Different secrets per environment
+-3. **Rotation policy** - Rotate secrets every 90 days
+-4. **Encryption at rest** - Encrypt secrets in secret managers
+-5. **Least privilege** - Minimal permissions per secret
+-
+-### Tools
+-
+-- **HashiCorp Vault** - Multi-cloud, dynamic secrets
+-- **AWS Secrets Manager** - Managed service, auto-rotation
+-- **Azure Key Vault** - Integrated with Azure services
+-- **Pulumi ESC** - Unified secrets orchestration (2025 trend)
+-
+-```typescript
+-// Good: Secrets from environment
+-const dbPassword = process.env.DB_PASSWORD;
+-if (!dbPassword) throw new Error('DB_PASSWORD not set');
+-```
+-
+-## API Security Checklist
+-
+-- [ ] Use HTTPS/TLS 1.3 only
+-- [ ] Implement OAuth 2.1 + JWT for authentication
+-- [ ] Rate limiting on all endpoints
+-- [ ] Input validation on all inputs
+-- [ ] Parameterized queries (prevent SQL injection)
+-- [ ] Security headers configured
+-- [ ] CORS properly configured (not `*` in production)
+-- [ ] API versioning implemented
+-- [ ] Error messages don't leak system info
+-- [ ] Logging authentication events
+-- [ ] MFA for admin accounts
+-- [ ] Regular security audits (quarterly)
+-
+-## Common Security Pitfalls
+-
+-1. **Client-side validation only** - Always validate on server
+-2. **Using Math.random() for tokens** - Use crypto.randomBytes()
+-3. **Storing passwords with bcrypt** - Use Argon2id (2025 standard)
+-4. **Trusting user input** - Validate and sanitize everything
+-5. **Weak CORS configuration** - Don't use `*` in production
+-6. **Insufficient logging** - Log all authentication/authorization events
+-7. **No rate limiting** - Implement on all public endpoints
+-
+-## Resources
+-
+-- **OWASP Top 10 (2025):** https://owasp.org/www-project-top-ten/
+-- **OWASP Cheat Sheets:** https://cheatsheetseries.owasp.org/
+-- **CWE Top 25:** https://cwe.mitre.org/top25/
+-- **NIST Guidelines:** https://www.nist.gov/cybersecurity
+diff --git a/.opencode/skill/backend-development/references/backend-technologies.md b/.opencode/skill/backend-development/references/backend-technologies.md
+deleted file mode 100644
+index f54ed37..0000000
+--- a/.opencode/skill/backend-development/references/backend-technologies.md
++++ /dev/null
+@@ -1,256 +0,0 @@
+-# Backend Technologies
+-
+-Core technologies, frameworks, databases, and message queues for modern backend development (2025).
+-
+-## Programming Languages
+-
+-### Node.js/TypeScript
+-**Market Position:** TypeScript dominance in Node.js backend (industry standard)
+-
+-**Best For:**
+-- Full-stack JavaScript teams
+-- Real-time applications (WebSockets, Socket.io)
+-- Rapid prototyping with npm ecosystem (2M+ packages)
+-- Event-driven architectures
+-
+-**Popular Frameworks:**
+-- **NestJS** - Enterprise-grade, TypeScript-first, modular architecture
+-- **Express** - Lightweight, flexible, most popular (23M weekly downloads)
+-- **Fastify** - High performance (20k req/sec vs Express 15k req/sec)
+-- **tRPC** - End-to-end typesafe APIs without GraphQL
+-
+-**When to Choose:** Team already using JavaScript/TypeScript, real-time features needed, rapid development priority
+-
+-### Python
+-**Market Position:** FastAPI adoption surge - 73% migrating from Flask
+-
+-**Best For:**
+-- Data-heavy applications
+-- ML/AI integration (TensorFlow, PyTorch)
+-- Scientific computing
+-- Scripting and automation
+-
+-**Popular Frameworks:**
+-- **FastAPI** - Modern, async, auto-generated OpenAPI docs, validation via Pydantic
+-- **Django** - Batteries-included, ORM, admin panel, authentication
+-- **Flask** - Lightweight, flexible, microservices-friendly
+-
+-**When to Choose:** Data science integration, ML/AI features, rapid prototyping, team Python expertise
+-
+-### Go
+-**Market Position:** Preferred for microservices at scale (Docker, Kubernetes written in Go)
+-
+-**Best For:**
+-- High-concurrency systems (goroutines)
+-- Microservices architectures
+-- CLI tools and DevOps tooling
+-- System programming
+-
+-**Popular Frameworks:**
+-- **Gin** - Fast HTTP router (40x faster than Martini)
+-- **Echo** - High performance, extensible
+-- **Fiber** - Express-like API, built on Fasthttp
+-
+-**When to Choose:** Microservices, high concurrency needs, DevOps tooling, simple deployment (single binary)
+-
+-### Rust
+-**Market Position:** 72% most admired language, 1.5x faster than Go
+-
+-**Best For:**
+-- Performance-critical systems
+-- Memory-safe system programming
+-- High-reliability requirements
+-- WebAssembly backends
+-
+-**Popular Frameworks:**
+-- **Axum** - Ergonomic, modular, tokio-based
+-- **Actix-web** - Fastest web framework (benchmark leader)
+-- **Rocket** - Type-safe, easy to use
+-
+-**When to Choose:** Maximum performance needed, memory safety critical, low-level control required
+-
+-## Databases
+-
+-### Relational (SQL)
+-
+-#### PostgreSQL
+-**Market Position:** Most popular SQL database for new projects
+-
+-**Strengths:**
+-- ACID compliance, data integrity
+-- JSON/JSONB support (hybrid SQL + NoSQL)
+-- Full-text search, geospatial (PostGIS)
+-- Advanced indexing (B-tree, Hash, GiST, GIN)
+-- Window functions, CTEs, materialized views
+-
+-**Use Cases:**
+-- E-commerce (transactions critical)
+-- Financial applications
+-- Complex reporting requirements
+-- Multi-tenant applications
+-
+-**When to Choose:** Need ACID guarantees, complex queries/joins, data integrity critical
+-
+-### NoSQL
+-
+-#### MongoDB
+-**Market Position:** Leading document database
+-
+-**Strengths:**
+-- Flexible/evolving schemas
+-- Horizontal scaling (sharding built-in)
+-- Aggregation pipeline (powerful data processing)
+-- GridFS for large files
+-
+-**Use Cases:**
+-- Content management systems
+-- Real-time analytics
+-- IoT data collection
+-- Catalogs with varied attributes
+-
+-**When to Choose:** Schema flexibility needed, rapid iteration, horizontal scaling required
+-
+-### Caching & In-Memory
+-
+-#### Redis
+-**Market Position:** Industry standard for caching and session storage
+-
+-**Capabilities:**
+-- In-memory key-value store
+-- Pub/sub messaging
+-- Sorted sets (leaderboards)
+-- Geospatial indexes
+-- Streams (event sourcing)
+-
+-**Performance:** 10-100x faster than disk-based databases
+-
+-**Use Cases:**
+-- Session storage
+-- Rate limiting
+-- Real-time leaderboards
+-- Job queues (Bull, BullMQ)
+-- Caching layer (90% DB load reduction)
+-
+-**When to Choose:** Need sub-millisecond latency, caching layer, session management
+-
+-## ORMs & Database Tools
+-
+-### Modern ORMs (2025)
+-
+-**Drizzle ORM** (TypeScript)
+-- Winning NestJS performance race
+-- 7.4kb, zero dependencies
+-- SQL-like syntax, full type safety
+-- Best for: Performance-critical TypeScript apps
+-
+-**Prisma** (TypeScript)
+-- Auto-generated type-safe client
+-- Database migrations included
+-- Excellent DX with Prisma Studio
+-- Best for: Rapid development, type safety
+-
+-**TypeORM** (TypeScript)
+-- Mature, feature-complete
+-- Supports Active Record + Data Mapper
+-- Best for: Complex enterprise apps
+-
+-**SQLAlchemy** (Python)
+-- Industry standard Python ORM
+-- Powerful query builder
+-- Best for: Python backends
+-
+-## Message Queues & Event Streaming
+-
+-### RabbitMQ
+-**Best For:** Task queues, request/reply patterns
+-
+-**Strengths:**
+-- Flexible routing (direct, topic, fanout, headers)
+-- Message acknowledgment and durability
+-- Dead letter exchanges
+-- Wide protocol support (AMQP, MQTT, STOMP)
+-
+-**Use Cases:**
+-- Background job processing
+-- Microservices communication
+-- Email/notification queues
+-
+-**When to Choose:** Traditional message queue needs, complex routing, moderate throughput
+-
+-### Apache Kafka
+-**Best For:** Event streaming, millions messages/second
+-
+-**Strengths:**
+-- Distributed, fault-tolerant
+-- High throughput (millions msg/sec)
+-- Message replay (retention-based)
+-- Stream processing (Kafka Streams)
+-
+-**Use Cases:**
+-- Real-time analytics
+-- Event sourcing
+-- Log aggregation
+-- Netflix/Uber scale (billions events/day)
+-
+-**When to Choose:** Event streaming, high throughput, event replay needed, real-time analytics
+-
+-## Framework Comparisons
+-
+-### Node.js Frameworks
+-
+-| Framework | Performance | Learning Curve | Use Case |
+-|-----------|------------|----------------|----------|
+-| Express | Moderate | Easy | Simple APIs, learning |
+-| NestJS | Moderate | Steep | Enterprise apps |
+-| Fastify | High | Moderate | Performance-critical |
+-| tRPC | High | Moderate | Full-stack TypeScript |
+-
+-### Python Frameworks
+-
+-| Framework | Performance | Features | Use Case |
+-|-----------|------------|----------|----------|
+-| FastAPI | High | Modern, async | New projects, APIs |
+-| Django | Moderate | Batteries-included | Full-featured apps |
+-| Flask | Moderate | Minimal | Microservices, simple APIs |
+-
+-## Technology Selection Flowchart
+-
+-```
+-Start → Need real-time features?
+-       → Yes → Node.js + Socket.io
+-       → No → Need ML/AI integration?
+-              → Yes → Python + FastAPI
+-              → No → Need maximum performance?
+-                     → Yes → Rust + Axum
+-                     → No → Need high concurrency?
+-                            → Yes → Go + Gin
+-                            → No → Node.js + NestJS (safe default)
+-
+-Database Selection:
+-ACID needed? → Yes → PostgreSQL
+-            → No → Flexible schema? → Yes → MongoDB
+-                                   → No → PostgreSQL (default)
+-
+-Caching needed? → Always use Redis
+-
+-Message Queue:
+-Millions msg/sec? → Yes → Kafka
+-                 → No → RabbitMQ
+-```
+-
+-## Common Pitfalls
+-
+-1. **Choosing NoSQL for relational data** - Use PostgreSQL if data has clear relationships
+-2. **Not using connection pooling** - Implement pooling for 5-10x performance boost
+-3. **Ignoring indexes** - Add indexes to frequently queried columns (30% I/O reduction)
+-4. **Over-engineering with microservices** - Start monolith, split when needed
+-5. **Not caching** - Redis caching provides 90% DB load reduction
+-
+-## Resources
+-
+-- **NestJS:** https://nestjs.com
+-- **FastAPI:** https://fastapi.tiangolo.com
+-- **PostgreSQL:** https://www.postgresql.org/docs/
+-- **MongoDB:** https://www.mongodb.com/docs/
+-- **Redis:** https://redis.io/docs/
+-- **Kafka:** https://kafka.apache.org/documentation/
+diff --git a/.opencode/skill/backend-development/references/backend-testing.md b/.opencode/skill/backend-development/references/backend-testing.md
+deleted file mode 100644
+index 9884e43..0000000
+--- a/.opencode/skill/backend-development/references/backend-testing.md
++++ /dev/null
+@@ -1,429 +0,0 @@
+-# Backend Testing Strategies
+-
+-Comprehensive testing approaches, frameworks, and quality assurance practices (2025).
+-
+-## Test Pyramid (70-20-10 Rule)
+-
+-```
+-        /\
+-       /E2E\     10% - End-to-End Tests
+-      /------\
+-     /Integr.\ 20% - Integration Tests
+-    /----------\
+-   /   Unit     \ 70% - Unit Tests
+-  /--------------\
+-```
+-
+-**Rationale:**
+-- Unit tests: Fast, cheap, isolate bugs quickly
+-- Integration tests: Verify component interactions
+-- E2E tests: Expensive, slow, but validate real user flows
+-
+-## Unit Testing
+-
+-### Frameworks by Language
+-
+-**TypeScript/JavaScript:**
+-- **Vitest** - 50% faster than Jest in CI/CD, ESM native
+-- **Jest** - Mature, large ecosystem, snapshot testing
+-
+-**Python:**
+-- **Pytest** - Industry standard, fixtures, parametrization
+-- **Unittest** - Built-in, standard library
+-
+-**Go:**
+-- **testing** - Built-in, table-driven tests
+-- **testify** - Assertions and mocking
+-
+-### Best Practices
+-
+-```typescript
+-// Good: Test single responsibility
+-describe('UserService', () => {
+-  describe('createUser', () => {
+-    it('should create user with valid data', async () => {
+-      const userData = { email: 'test@example.com', name: 'Test' };
+-      const user = await userService.createUser(userData);
+-
+-      expect(user).toMatchObject(userData);
+-      expect(user.id).toBeDefined();
+-    });
+-
+-    it('should throw error with duplicate email', async () => {
+-      const userData = { email: 'existing@example.com', name: 'Test' };
+-
+-      await expect(userService.createUser(userData))
+-        .rejects.toThrow('Email already exists');
+-    });
+-
+-    it('should hash password before storing', async () => {
+-      const userData = { email: 'test@example.com', password: 'plain123' };
+-      const user = await userService.createUser(userData);
+-
+-      expect(user.password).not.toBe('plain123');
+-      expect(user.password).toMatch(/^\$argon2id\$/);
+-    });
+-  });
+-});
+-```
+-
+-### Mocking
+-
+-```typescript
+-// Mock external dependencies
+-jest.mock('./emailService');
+-
+-it('should send welcome email after user creation', async () => {
+-  const emailService = require('./emailService');
+-  emailService.sendWelcomeEmail = jest.fn();
+-
+-  await userService.createUser({ email: 'test@example.com' });
+-
+-  expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith('test@example.com');
+-});
+-```
+-
+-## Integration Testing
+-
+-### API Integration Tests
+-
+-```typescript
+-import request from 'supertest';
+-import { app } from '../app';
+-
+-describe('POST /api/users', () => {
+-  beforeAll(async () => {
+-    await db.connect(); // Real database connection (test DB)
+-  });
+-
+-  afterAll(async () => {
+-    await db.disconnect();
+-  });
+-
+-  beforeEach(async () => {
+-    await db.users.deleteMany({}); // Clean state
+-  });
+-
+-  it('should create user and return 201', async () => {
+-    const response = await request(app)
+-      .post('/api/users')
+-      .send({ email: 'test@example.com', name: 'Test User' })
+-      .expect(201);
+-
+-    expect(response.body).toMatchObject({
+-      email: 'test@example.com',
+-      name: 'Test User',
+-    });
+-
+-    // Verify database persistence
+-    const user = await db.users.findOne({ email: 'test@example.com' });
+-    expect(user).toBeDefined();
+-  });
+-
+-  it('should return 400 for invalid email', async () => {
+-    await request(app)
+-      .post('/api/users')
+-      .send({ email: 'invalid-email', name: 'Test' })
+-      .expect(400)
+-      .expect((res) => {
+-        expect(res.body.error).toBe('Invalid email format');
+-      });
+-  });
+-});
+-```
+-
+-### Database Testing with TestContainers
+-
+-```typescript
+-import { GenericContainer } from 'testcontainers';
+-
+-let container;
+-let db;
+-
+-beforeAll(async () => {
+-  // Spin up real PostgreSQL in Docker
+-  container = await new GenericContainer('postgres:15')
+-    .withEnvironment({ POSTGRES_PASSWORD: 'test' })
+-    .withExposedPorts(5432)
+-    .start();
+-
+-  const port = container.getMappedPort(5432);
+-  db = await createConnection({
+-    host: 'localhost',
+-    port,
+-    database: 'test',
+-    password: 'test',
+-  });
+-}, 60000);
+-
+-afterAll(async () => {
+-  await container.stop();
+-});
+-```
+-
+-## Contract Testing (Microservices)
+-
+-### Pact (Consumer-Driven Contracts)
+-
+-```typescript
+-// Consumer test
+-import { Pact } from '@pact-foundation/pact';
+-
+-const provider = new Pact({
+-  consumer: 'UserService',
+-  provider: 'AuthService',
+-});
+-
+-describe('Auth Service Contract', () => {
+-  beforeAll(() => provider.setup());
+-  afterEach(() => provider.verify());
+-  afterAll(() => provider.finalize());
+-
+-  it('should validate user token', async () => {
+-    await provider.addInteraction({
+-      state: 'user token exists',
+-      uponReceiving: 'a request to validate token',
+-      withRequest: {
+-        method: 'POST',
+-        path: '/auth/validate',
+-        headers: { 'Content-Type': 'application/json' },
+-        body: { token: 'valid-token-123' },
+-      },
+-      willRespondWith: {
+-        status: 200,
+-        body: { valid: true, userId: '123' },
+-      },
+-    });
+-
+-    const response = await authClient.validateToken('valid-token-123');
+-    expect(response.valid).toBe(true);
+-  });
+-});
+-```
+-
+-## Load Testing
+-
+-### Tools Comparison
+-
+-**k6** (Modern, Developer-Friendly)
+-```javascript
+-import http from 'k6/http';
+-import { check, sleep } from 'k6';
+-
+-export const options = {
+-  stages: [
+-    { duration: '2m', target: 100 }, // Ramp up to 100 users
+-    { duration: '5m', target: 100 }, // Stay at 100 users
+-    { duration: '2m', target: 0 },   // Ramp down to 0 users
+-  ],
+-  thresholds: {
+-    http_req_duration: ['p(95)<500'], // 95% requests under 500ms
+-  },
+-};
+-
+-export default function () {
+-  const res = http.get('https://api.example.com/users');
+-  check(res, {
+-    'status is 200': (r) => r.status === 200,
+-    'response time < 500ms': (r) => r.timings.duration < 500,
+-  });
+-  sleep(1);
+-}
+-```
+-
+-**Gatling** (JVM-based, Advanced Scenarios)
+-**JMeter** (GUI-based, Traditional)
+-
+-### Performance Thresholds
+-
+-- **Response time:** p95 < 500ms, p99 < 1s
+-- **Throughput:** 1000+ req/sec (target based on SLA)
+-- **Error rate:** < 1%
+-- **Concurrent users:** Test at 2x expected peak
+-
+-## E2E Testing
+-
+-### Playwright (Modern, Multi-Browser)
+-
+-```typescript
+-import { test, expect } from '@playwright/test';
+-
+-test('user can register and login', async ({ page }) => {
+-  // Navigate to registration page
+-  await page.goto('https://app.example.com/register');
+-
+-  // Fill registration form
+-  await page.fill('input[name="email"]', 'test@example.com');
+-  await page.fill('input[name="password"]', 'SecurePass123!');
+-  await page.click('button[type="submit"]');
+-
+-  // Verify redirect to dashboard
+-  await expect(page).toHaveURL('/dashboard');
+-  await expect(page.locator('h1')).toContainText('Welcome');
+-
+-  // Verify API call was made
+-  const response = await page.waitForResponse('/api/users');
+-  expect(response.status()).toBe(201);
+-});
+-```
+-
+-## Database Migration Testing
+-
+-**Critical:** 83% migrations fail without proper testing
+-
+-```typescript
+-describe('Database Migrations', () => {
+-  it('should migrate from v1 to v2 without data loss', async () => {
+-    // Insert test data in v1 schema
+-    await db.query(`
+-      INSERT INTO users (id, email, name)
+-      VALUES (1, 'test@example.com', 'Test User')
+-    `);
+-
+-    // Run migration
+-    await runMigration('v2-add-created-at.sql');
+-
+-    // Verify v2 schema
+-    const result = await db.query('SELECT * FROM users WHERE id = 1');
+-    expect(result.rows[0]).toMatchObject({
+-      id: 1,
+-      email: 'test@example.com',
+-      name: 'Test User',
+-      created_at: expect.any(Date),
+-    });
+-  });
+-
+-  it('should rollback migration successfully', async () => {
+-    await runMigration('v2-add-created-at.sql');
+-    await rollbackMigration('v2-add-created-at.sql');
+-
+-    // Verify v1 schema restored
+-    const columns = await db.query(`
+-      SELECT column_name FROM information_schema.columns
+-      WHERE table_name = 'users'
+-    `);
+-    expect(columns.rows.map(r => r.column_name)).not.toContain('created_at');
+-  });
+-});
+-```
+-
+-## Security Testing
+-
+-### SAST (Static Application Security Testing)
+-
+-```bash
+-# SonarQube for code quality + security
+-sonar-scanner \
+-  -Dsonar.projectKey=my-backend \
+-  -Dsonar.sources=src \
+-  -Dsonar.host.url=http://localhost:9000
+-
+-# Semgrep for security patterns
+-semgrep --config auto src/
+-```
+-
+-### DAST (Dynamic Application Security Testing)
+-
+-```bash
+-# OWASP ZAP for runtime security scanning
+-docker run -t owasp/zap2docker-stable zap-baseline.py \
+-  -t https://api.example.com \
+-  -r zap-report.html
+-```
+-
+-### Dependency Scanning (SCA)
+-
+-```bash
+-# npm audit for Node.js
+-npm audit fix
+-
+-# Snyk for multi-language
+-snyk test
+-snyk monitor  # Continuous monitoring
+-```
+-
+-## Code Coverage
+-
+-### Target Metrics (SonarQube Standards)
+-
+-- **Overall coverage:** 80%+
+-- **Critical paths:** 100% (authentication, payment, data integrity)
+-- **New code:** 90%+
+-
+-### Implementation
+-
+-```bash
+-# Vitest with coverage
+-vitest run --coverage
+-
+-# Jest with coverage
+-jest --coverage --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80}}'
+-```
+-
+-## CI/CD Testing Pipeline
+-
+-```yaml
+-# GitHub Actions example
+-name: Test Pipeline
+-
+-on: [push, pull_request]
+-
+-jobs:
+-  test:
+-    runs-on: ubuntu-latest
+-    steps:
+-      - uses: actions/checkout@v3
+-
+-      - name: Unit Tests
+-        run: npm run test:unit
+-
+-      - name: Integration Tests
+-        run: npm run test:integration
+-
+-      - name: E2E Tests
+-        run: npm run test:e2e
+-
+-      - name: Load Tests
+-        run: k6 run load-test.js
+-
+-      - name: Security Scan
+-        run: npm audit && snyk test
+-
+-      - name: Coverage Report
+-        run: npm run test:coverage
+-
+-      - name: Upload to Codecov
+-        uses: codecov/codecov-action@v3
+-```
+-
+-## Testing Best Practices
+-
+-1. **Arrange-Act-Assert (AAA) Pattern**
+-2. **One assertion per test** (when practical)
+-3. **Descriptive test names** - `should throw error when email is invalid`
+-4. **Test edge cases** - Empty inputs, boundary values, null/undefined
+-5. **Clean test data** - Reset database state between tests
+-6. **Fast tests** - Unit tests < 10ms, Integration < 100ms
+-7. **Deterministic** - No flaky tests, avoid sleep(), use waitFor()
+-8. **Independent** - Tests don't depend on execution order
+-
+-## Testing Checklist
+-
+-- [ ] Unit tests cover 70% of codebase
+-- [ ] Integration tests for all API endpoints
+-- [ ] Contract tests for microservices
+-- [ ] Load tests configured (k6/Gatling)
+-- [ ] E2E tests for critical user flows
+-- [ ] Database migration tests
+-- [ ] Security scanning in CI/CD (SAST, DAST, SCA)
+-- [ ] Code coverage reports automated
+-- [ ] Tests run on every PR
+-- [ ] Flaky tests eliminated
+-
+-## Resources
+-
+-- **Vitest:** https://vitest.dev/
+-- **Playwright:** https://playwright.dev/
+-- **k6:** https://k6.io/docs/
+-- **Pact:** https://docs.pact.io/
+-- **TestContainers:** https://testcontainers.com/
